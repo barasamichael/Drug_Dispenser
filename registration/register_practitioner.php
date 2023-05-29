@@ -6,6 +6,8 @@ require_once "views.php";
 if ($_SERVER["REQUEST_METHOD"] === "POST")
 {
 	handleRegisterPractitionerFormSubmission();
+	header("Location: templates/main/homepage.php");
+	exit;
 }
 
 ob_start();

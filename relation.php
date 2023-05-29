@@ -66,6 +66,7 @@ class Relation
 		try
 		{
 			$dbHandler = new DatabaseHandler($dsn, $username, $password);
+			$dbHandler->connect();
 			$attributes = [];
 
 			// Retrieve attributes and their values
@@ -92,12 +93,12 @@ class Relation
 				"($placeholders)";
 
 			// Execute the query
-			$dbHandler->executeQuery($sql, $attributes);
+			$success = $dbHandler->executeQuery($SQL, $attributes);
 			$dbHandler->disconnect();
 
 			if ($success)
 			{
-				echo "Data saved successfully";
+				return $success;
 			}
 			else
 			{
@@ -110,7 +111,7 @@ class Relation
 			$pdo = null;
 
 			// Operation successfull :)
-			return true;
+			return $success;
 		}
 		catch (PDOException $error)
 		{

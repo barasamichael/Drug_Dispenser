@@ -34,5 +34,7 @@ class DatabaseHandler
 			$errorMessage = $errorInfo[2];
 			throw new PDOException($errorMessage);
 		}
+
+		return $success;
 	}
 }

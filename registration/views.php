@@ -1,8 +1,17 @@
 <?php
 
 require_once("forms.php");
+require_once("../models.php");
 echo "<link href = '../bootstrap.min.css' rel = 'stylesheet'>";
 echo "<link href = '../static/css/styles.css' rel = 'stylesheet'>";
+
+function sanitizeForm()
+{
+	foreach ($_POST as $key => $value)
+	{
+		$_POST[$key] = filter_var($value, FILTER_SANITIZE_STRING);
+	}
+}
 
 function renderRegisterDrugForm()
 {
@@ -14,8 +23,13 @@ function handleRegisterDrugFormSubmission()
 {
 	if ($_SERVER['REQUEST_METHOD'] === 'POST')
 	{
-		header("Location: templates/main/homepage.php");
-		exit;
+		sanitizeForm();
+		$drug = new Drug([
+			"formula" => $_POST['formala'],
+			"form" => $_POST['form'],
+			"scientificName" => $_POST['scientificName']
+		]);
+		$drug->save();
 	}
 }
 
@@ -29,8 +43,21 @@ function handleRegisterPatientFormSubmission()
 {
 	if ($_SERVER['REQUEST_METHOD'] === 'POST')
 	{
-		header("Location: templates/main/homepage.php");
-		exit;
+		sanitizeForm();
+		$patient = new Patient([
+			'firstName' => $_POST['firstName'],
+			'middleName' => $_POST['middleName'],
+			'lastName' => $_POST['lastName'],
+			'gender' => $_POST['gender'],
+			'dateOfBirth' => $_POST['dateOfBirth'],
+			'residentialAddress' => $_POST['residentialAddress'],
+			'phoneNumber' => $_POST['phoneNumber'],
+			'emailAddress' => $_POST['emailAddress'],
+			'passwordHash' => $_POST['password'],
+			'lastSeen' => $_POST['lastSeen'],
+			'SSN' => $_POST['SSN']
+		]);
+		$patient->save();
 	}
 }
 
@@ -44,8 +71,19 @@ function handleRegisterPractitionerFormSubmission()
 {
 	if ($_SERVER['REQUEST_METHOD'] === 'POST')
 	{
-		header("Location: templates/main/homepage.php");
-		exit;
+		sanitizeForm();
+		$practitioner = new Practitioner([
+			'SSN' => $_POST['SSN'],
+			'firstName' => $_POST['firstName'],
+			'middleName' => $_POST['middleName'],
+			'lastName' => $_POST['lastName'],
+			'gender' => $_POST['gender'],
+			'dateOfBirth' => $_POST['dateOfBirth'],
+			'phoneNumber' => $_POST['phoneNumber'],
+			'emailAddress' => $_POST['emailAddress'],
+			'passwordHash' => $_POST['password']
+		]);
+		$practitioner->save();
 	}
 }
 
@@ -59,8 +97,15 @@ function handleRegisterSupervisorFormSubmission()
 {
 	if ($_SERVER['REQUEST_METHOD'] === 'POST')
 	{
-		header("Location: templates/main/homepage.php");
-		exit;
+		sanitizeForm();
+		$supervisor = new Supervisor([
+			'firstName' => $_POST['firstName'],
+			'middleName' => $_POST['middleName'],
+			'lastName' => $_POST['lastName'],
+			'emailAddress' => $_POST['emailAddress'],
+			'phoneNumber' => $_POST['phoneNumber']
+		]);
+		$supervisor->save();
 	}
 }
 ?>

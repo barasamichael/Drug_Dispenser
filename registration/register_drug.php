@@ -6,6 +6,8 @@ require_once "views.php";
 if ($_SERVER["REQUEST_METHOD"] === "POST")
 {
 	handleRegisterDrugFormSubmission();
+	header("Location: register_drug.php");
+	exit;
 }
 
 ob_start();

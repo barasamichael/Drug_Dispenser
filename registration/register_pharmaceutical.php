@@ -5,14 +5,16 @@ require_once "views.php";
 
 if ($_SERVER["REQUEST_METHOD"] === "POST")
 {
-	handleLoginFormSubmission();
+	handleRegisterPharmaceuticalFormSubmission();
+	header("Location: templates/main/homepage.php");
+	exit;
 }
 
 ob_start();
-renderLoginForm();
+renderRegisterPharmaceuticalForm();
 
 $content = ob_get_clean();
-$title = "Patient Login";
+$title = "Pharmaceutical Registration";
 
 include "../templates/base.php";
 ?>

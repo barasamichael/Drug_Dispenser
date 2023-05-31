@@ -56,7 +56,7 @@ class Field
 	{
 		return $this->_getAttribute($attributeName);
 	}
-	
+
 	public function render()
 	{
 		$html = "<div class = 'form-group'>";
@@ -92,7 +92,7 @@ class Field
 
 		return $html;
 	}
-	
+
 	public function getType()
 	{
 		return $this->type;
@@ -116,356 +116,362 @@ class SubmitField extends Field
 
 class IntegerField extends Field
 {
-    protected $type = 'number';
+	protected $type = 'number';
 
-    public function render()
-    {
-        $html = '<div class="form-group">';
-        
-        if (!empty($this->label)) {
-            $html .= '<label for="' . $this->name . '">' . $this->label . '</label>';
-        }
-       	
-	$html .= '<input type="' . $this->type . '" name="' . $this->name . 
-		'" class="form-control"';
+	public function render()
+	{
+		$html = '<div class="form-group">';
 
-        if (!empty($this->value)) {
-            $html .= ' value="' . $this->value . '"';
-        }
+		if (!empty($this->label)) {
+			$html .= '<label for="' . $this->name . '">' . $this->label . '</label>';
+		}
 
-        if ($this->required) {
-            $html .= ' required';
-        }
+		$html .= '<input type="' . $this->type . '" name="' . $this->name . 
+			'" class="form-control"';
 
-        if ($this->readonly) {
-            $html .= ' readonly';
-        }
+		if (!empty($this->value)) {
+			$html .= ' value="' . $this->value . '"';
+		}
 
-        if ($this->disabled) {
-            $html .= ' disabled';
-        }
-        
-        $html .= '>';
-        $html .= '</div>';
+		if ($this->required) {
+			$html .= ' required';
+		}
 
-        return $html;
-    }
+		if ($this->readonly) {
+			$html .= ' readonly';
+		}
+
+		if ($this->disabled) {
+			$html .= ' disabled';
+		}
+
+		$html .= '>';
+		$html .= '</div>';
+
+		return $html;
+	}
 }
 
 class StringField extends Field
 {
-    protected $type = 'text';
+	protected $type = 'text';
 
-    public function render()
-    {
-        $html = '<div class="form-group">';
-        
-        if (!empty($this->label)) {
-            $html .= '<label for="' . $this->name . '">' . $this->label . '</label>';
-        }
-        
-	$html .= '<input type="' . $this->type . '" name="' . $this->name . 
-		'" class="form-control"';
+	public function render()
+	{
+		$html = '<div class="form-group">';
 
-        if (!empty($this->value)) {
-            $html .= ' value="' . $this->value . '"';
-        }
+		if (!empty($this->label)) {
+			$html .= '<label for="' . $this->name . '">' . $this->label . '</label>';
+		}
 
-        if ($this->required) {
-            $html .= ' required';
-        }
+		$html .= '<input type="' . $this->type . '" name="' . $this->name . 
+			'" class="form-control"';
 
-        if ($this->readonly) {
-            $html .= ' readonly';
-        }
+		if (!empty($this->value)) {
+			$html .= ' value="' . $this->value . '"';
+		}
 
-        if ($this->disabled) {
-            $html .= ' disabled';
-        }
-        
-        $html .= '>';
-        $html .= '</div>';
+		if ($this->required) {
+			$html .= ' required';
+		}
 
-        return $html;
-    }
+		if ($this->readonly) {
+			$html .= ' readonly';
+		}
+
+		if ($this->disabled) {
+			$html .= ' disabled';
+		}
+
+		$html .= '>';
+		$html .= '</div>';
+
+		return $html;
+	}
 }
 
 class TextAreaField extends Field
 {
-    public function render()
-    {
-        $html = '<div class="form-group">';
-        
-        if (!empty($this->label)) {
-            $html .= '<label for="' . $this->name . '">' . $this->label . '</label>';
-        }
-        
-        $html .= '<textarea name="' . $this->name . '" class="form-control"';
-        
-        if ($this->required) {
-            $html .= ' required';
-        }
+	private $rows;
 
-        if ($this->readonly) {
-            $html .= ' readonly';
-        }
+	public function render()
+	{
+		$html = '<div class="form-group">';
 
-        if ($this->disabled) {
-            $html .= ' disabled';
-        }
-        
-        $html .= '>';
+		if (!empty($this->label)) {
+			$html .= '<label for="' . $this->name . '">' . $this->label . '</label>';
+		}
 
-        if (!empty($this->value)) {
-            $html .= $this->value;
-        }
+		$html .= '<textarea name="' . $this->name . '" class="form-control"';
 
-        $html .= '</textarea>';
-        $html .= '</div>';
+		if ($this->required) {
+			$html .= ' required';
+		}
 
-        return $html;
-    }
+		if ($this->readonly) {
+			$html .= ' readonly';
+		}
+
+		if ($this->rows){
+			$html .= ' rows = "' . $this->rows . '"';
+		}
+
+		if ($this->disabled) {
+			$html .= ' disabled';
+		}
+
+		$html .= '>';
+
+		if (!empty($this->value)) {
+			$html .= $this->value;
+		}
+
+		$html .= '</textarea>';
+		$html .= '</div>';
+
+		return $html;
+	}
 }
 
 class CheckButtonField extends Field
 {
-    public function render()
-    {
-        $html = '<div class="form-check">';
-        
-        $html .= '<input type="checkbox" name="' . $this->name . '" class="form-check-input"';
-        
-        if (!empty($this->value)) {
-            $html .= ' value="' . $this->value . '"';
-        }
+	public function render()
+	{
+		$html = '<div class="form-check">';
 
-        if ($this->required) {
-            $html .= ' required';
-        }
+		$html .= '<input type="checkbox" name="' . $this->name . '" class="form-check-input"';
 
-        if ($this->readonly) {
-            $html .= ' readonly';
-        }
+		if (!empty($this->value)) {
+			$html .= ' value="' . $this->value . '"';
+		}
 
-        if ($this->disabled) {
-            $html .= ' disabled';
-        }
-        
-        $html .= '>';
+		if ($this->required) {
+			$html .= ' required';
+		}
 
-        if (!empty($this->label)) {
-		$html .= '<label class="form-check-label" for="' . $this->name . '">' . 
-			$this->label . '</label>';
-        }
+		if ($this->readonly) {
+			$html .= ' readonly';
+		}
 
-        $html .= '</div>';
+		if ($this->disabled) {
+			$html .= ' disabled';
+		}
 
-        return $html;
-    }
+		$html .= '>';
+
+		if (!empty($this->label)) {
+			$html .= '<label class="form-check-label" for="' . $this->name . '">' . 
+				$this->label . '</label>';
+		}
+
+		$html .= '</div>';
+
+		return $html;
+	}
 }
 
 class SelectField extends Field
 {
-    protected $options;
+	protected $options;
 
-    public function __construct($attributes = [])
-    {
-        parent::__construct($attributes);
+	public function __construct($attributes = [])
+	{
+		parent::__construct($attributes);
 
-        if (isset($attributes['options'])) {
-            $this->options = $attributes['options'];
-        }
-    }
+		if (isset($attributes['options'])) {
+			$this->options = $attributes['options'];
+		}
+	}
 
-    public function render()
-    {
-        $html = '<div class="form-group">';
+	public function render()
+	{
+		$html = '<div class="form-group">';
 
-        if (!empty($this->label)) {
-            $html .= '<label for="' . $this->name . '">' . $this->label . '</label>';
-        }
+		if (!empty($this->label)) {
+			$html .= '<label for="' . $this->name . '">' . $this->label . '</label>';
+		}
 
-        $html .= '<select name="' . $this->name . '" class="form-control">';
+		$html .= '<select name="' . $this->name . '" class="form-control">';
 
-        foreach ($this->options as $value => $label) {
-            $html .= '<option value="' . $value . '"';
+		foreach ($this->options as $value => $label) {
+			$html .= '<option value="' . $value . '"';
 
-            if ($this->value == $value) {
-                $html .= ' selected';
-            }
+			if ($this->value == $value) {
+				$html .= ' selected';
+			}
 
-            $html .= '>' . $label . '</option>';
-        }
+			$html .= '>' . $label . '</option>';
+		}
 
-        $html .= '</select></div>';
+		$html .= '</select></div>';
 
-        return $html;
-    }
+		return $html;
+	}
 }
 
 class FileField extends Field
 {
-    public function __construct($attributes = [])
-    {
-        parent::__construct($attributes);
-    }
+	public function __construct($attributes = [])
+	{
+		parent::__construct($attributes);
+	}
 
-    public function render()
-    {
-        $html = '<div class="form-group">';
+	public function render()
+	{
+		$html = '<div class="form-group">';
 
-        if (!empty($this->label)) {
-            $html .= '<label for="' . $this->name . '">' . $this->label . '</label>';
-        }
+		if (!empty($this->label)) {
+			$html .= '<label for="' . $this->name . '">' . $this->label . '</label>';
+		}
 
-        $html .= '<input type="file" name="' . $this->name . '" class="form-control-file"';
+		$html .= '<input type="file" name="' . $this->name . '" class="form-control-file"';
 
-        if ($this->required) {
-            $html .= ' required';
-        }
+		if ($this->required) {
+			$html .= ' required';
+		}
 
-        $html .= '></div>';
+		$html .= '></div>';
 
-        return $html;
-    }
+		return $html;
+	}
 }
 
 class DateField extends Field
 {
-    public function __construct($attributes = [])
-    {
-        parent::__construct($attributes);
-    }
+	public function __construct($attributes = [])
+	{
+		parent::__construct($attributes);
+	}
 
-    public function render()
-    {
-        $html = '<div class="form-group">';
+	public function render()
+	{
+		$html = '<div class="form-group">';
 
-        if (!empty($this->label)) {
-            $html .= '<label for="' . $this->name . '">' . $this->label . '</label>';
-        }
+		if (!empty($this->label)) {
+			$html .= '<label for="' . $this->name . '">' . $this->label . '</label>';
+		}
 
-        $html .= '<input type="date" name="' . $this->name . '" class="form-control"';
+		$html .= '<input type="date" name="' . $this->name . '" class="form-control"';
 
-        if (!empty($this->value)) {
-            $html .= ' value="' . $this->value . '"';
-        }
+		if (!empty($this->value)) {
+			$html .= ' value="' . $this->value . '"';
+		}
 
-        if ($this->required) {
-            $html .= ' required';
-        }
+		if ($this->required) {
+			$html .= ' required';
+		}
 
-        $html .= '></div>';
+		$html .= '></div>';
 
-        return $html;
-    }
+		return $html;
+	}
 }
 
 class FloatField extends Field
 {
-    public function __construct($attributes = [])
-    {
-        parent::__construct($attributes);
-    }
+	public function __construct($attributes = [])
+	{
+		parent::__construct($attributes);
+	}
 
-    public function render()
-    {
-        $html = '<div class="form-group">';
+	public function render()
+	{
+		$html = '<div class="form-group">';
 
-        if (!empty($this->label)) {
-            $html .= '<label for="' . $this->name . '">' . $this->label . '</label>';
-        }
+		if (!empty($this->label)) {
+			$html .= '<label for="' . $this->name . '">' . $this->label . '</label>';
+		}
 
-        $html .= '<input type="number" name="' . $this->name . '" step="0.01" class="form-control"';
+		$html .= '<input type="number" name="' . $this->name . '" step="0.01" class="form-control"';
 
-        if (!empty($this->value)) {
-            $html .= ' value="' . $this->value . '"';
-        }
+		if (!empty($this->value)) {
+			$html .= ' value="' . $this->value . '"';
+		}
 
-        if ($this->required) {
-            $html .= ' required';
-        }
+		if ($this->required) {
+			$html .= ' required';
+		}
 
-        $html .= '></div>';
+		$html .= '></div>';
 
-        return $html;
-    }
+		return $html;
+	}
 }
 
 class DateTimeField extends Field
 {
-    public function __construct($attributes = [])
-    {
-        parent::__construct($attributes);
-    }
+	public function __construct($attributes = [])
+	{
+		parent::__construct($attributes);
+	}
 
-    public function render()
-    {
-        $html = '<div class="form-group">';
+	public function render()
+	{
+		$html = '<div class="form-group">';
 
-        if (!empty($this->label)) {
-            $html .= '<label for="' . $this->name . '">' . $this->label . '</label>';
-        }
+		if (!empty($this->label)) {
+			$html .= '<label for="' . $this->name . '">' . $this->label . '</label>';
+		}
 
-        $html .= '<input type="datetime-local" name="' . $this->name . '" class="form-control"';
+		$html .= '<input type="datetime-local" name="' . $this->name . '" class="form-control"';
 
-        if (!empty($this->value)) {
-            $html .= ' value="' . $this->value . '"';
-        }
+		if (!empty($this->value)) {
+			$html .= ' value="' . $this->value . '"';
+		}
 
-        if ($this->required) {
-            $html .= ' required';
-        }
+		if ($this->required) {
+			$html .= ' required';
+		}
 
-        $html .= '></div>';
+		$html .= '></div>';
 
-        return $html;
-    }
+		return $html;
+	}
 }
 
 class RadioButtonField extends Field
 {
-    protected $choices;
+	protected $choices;
 
-    public function __construct($attributes = [])
-    {
-        parent::__construct($attributes);
+	public function __construct($attributes = [])
+	{
+		parent::__construct($attributes);
 
-        if (isset($attributes['choices'])) {
-            $this->choices = $attributes['choices'];
-        }
-    }
+		if (isset($attributes['choices'])) {
+			$this->choices = $attributes['choices'];
+		}
+	}
 
-    public function render()
-    {
-        $html = '<div class="form-group">';
+	public function render()
+	{
+		$html = '<div class="form-group">';
 
-        if (!empty($this->label)) {
-            $html .= '<label for="' . $this->name . '">' . $this->label . '</label>';
-        }
+		if (!empty($this->label)) {
+			$html .= '<label for="' . $this->name . '">' . $this->label . '</label>';
+		}
 
-        foreach ($this->choices as $value => $label) {
-            $html .= '<div class="form-check">';
-	    $html .= '<input class="form-check-input" type="radio" name="' . $this->name . 
-		    '" value="' . $value . '"';
+		foreach ($this->choices as $value => $label) {
+			$html .= '<div class="form-check">';
+			$html .= '<input class="form-check-input" type="radio" name="' . $this->name . 
+				'" value="' . $value . '"';
 
-            if ($this->value == $value) {
-                $html .= ' checked';
-            }
+			if ($this->value == $value) {
+				$html .= ' checked';
+			}
 
-            if ($this->required) {
-                $html .= ' required';
-            }
+			if ($this->required) {
+				$html .= ' required';
+			}
 
-            $html .= '>';
-            $html .= '<label class="form-check-label">' . $label . '</label>';
-            $html .= '</div>';
-        }
+			$html .= '>';
+			$html .= '<label class="form-check-label">' . $label . '</label>';
+			$html .= '</div>';
+		}
 
-        $html .= '</div>';
+		$html .= '</div>';
 
-        return $html;
-    }
+		return $html;
+	}
 }
 
 class PasswordField extends Field
@@ -477,28 +483,28 @@ class PasswordField extends Field
 		$this->attributes = $attributes;
 	}
 
-    public function validate($value)
-    {
-        if (empty($value)) {
-            return 'Please enter a password.';
-        }
-        return true;
-    }
+	public function validate($value)
+	{
+		if (empty($value)) {
+			return 'Please enter a password.';
+		}
+		return true;
+	}
 
-    public function render()
-    {
-        $name = $this->attributes['name'];
-        $label = $this->attributes['label'];
-        $required = $this->attributes['required'] ? 'required' : '';
+	public function render()
+	{
+		$name = $this->attributes['name'];
+		$label = $this->attributes['label'];
+		$required = $this->attributes['required'] ? 'required' : '';
 
-        $html = '<div class="form-group">';
-        $html .= '<label for="' . $name . '">' . $label . '</label>';
-	$html .= '<input type="password" class="form-control" id="' . 
-		$name . '" name="' . $name . '" ' . $required . '>';
-        $html .= '</div>';
+		$html = '<div class="form-group">';
+		$html .= '<label for="' . $name . '">' . $label . '</label>';
+		$html .= '<input type="password" class="form-control" id="' . 
+			$name . '" name="' . $name . '" ' . $required . '>';
+		$html .= '</div>';
 
-        return $html;
-    }
+		return $html;
+	}
 }
 
 class EmailAddressField extends Field
@@ -510,27 +516,27 @@ class EmailAddressField extends Field
 		$this->attributes = $attributes;
 	}
 
-    public function validate($value)
-    {
-        if (filter_var($value, FILTER_VALIDATE_EMAIL) === false) {
-            return 'Please enter a valid email address.';
-        }
-        return true;
-    }
+	public function validate($value)
+	{
+		if (filter_var($value, FILTER_VALIDATE_EMAIL) === false) {
+			return 'Please enter a valid email address.';
+		}
+		return true;
+	}
 
-    public function render()
-    {
-        $name = $this->attributes['name'];
-        $label = $this->attributes['label'];
-        $required = $this->attributes['required'] ? 'required' : '';
-        $value = isset($this->attributes['value']) ? $this->attributes['value'] : '';
+	public function render()
+	{
+		$name = $this->attributes['name'];
+		$label = $this->attributes['label'];
+		$required = $this->attributes['required'] ? 'required' : '';
+		$value = isset($this->attributes['value']) ? $this->attributes['value'] : '';
 
-        $html = '<div class="form-group">';
-        $html .= '<label for="' . $name . '">' . $label . '</label>';
-        $html .= '<input type="email" class="form-control" id="' . $name . '" name="' . $name . '" value="' . $value . '" ' . $required . '>';
-        $html .= '</div>';
+		$html = '<div class="form-group">';
+		$html .= '<label for="' . $name . '">' . $label . '</label>';
+		$html .= '<input type="email" class="form-control" id="' . $name . '" name="' . $name . '" value="' . $value . '" ' . $required . '>';
+		$html .= '</div>';
 
-        return $html;
-    }
+		return $html;
+	}
 }
 ?>

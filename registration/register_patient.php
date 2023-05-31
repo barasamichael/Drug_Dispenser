@@ -10,11 +10,20 @@ if ($_SERVER["REQUEST_METHOD"] === "POST")
 	exit;
 }
 
+# Set page header
+$content = <<<_HTML
+	<div class = "page-header">
+	<h3>Patient Login</h3>
+	</div>
+	_HTML;
+
+# Retrieve HTML Code for patient registration form
 ob_start();
 renderRegisterPatientForm();
+$content .= ob_get_clean();
 
-$content = ob_get_clean();
-$title = "Patient Login";
+# Set page title
+$title = "Patient Registration";
 
 include "../templates/base.php";
 ?>

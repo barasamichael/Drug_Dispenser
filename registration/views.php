@@ -33,6 +33,94 @@ function handleRegisterDrugFormSubmission()
 	}
 }
 
+function renderRegisterContractForm()
+{
+	$form = new RegisterContractForm();
+	echo $form->render();
+}
+
+function handleRegisterContractFormSubmission()
+{
+	if ($_SERVER['REQUEST_METHOD'] === 'POST')
+	{
+		sanitizeForm();
+		$contract = new Contract([
+			"pharmaceuticalId" => $_POST['pharmaceuticalId'],
+			"startDate" => $_POST['startDate'],
+			"endDate" => $_POST['endDate'],
+			"description" => $_POST['description'],
+			"fileUrl" => $_POST['fileUrl'],
+			"pharmacyId" => $_POST['pharmacyId']
+		]);
+		$contract->save();
+	}
+}
+
+function renderRegisterPharmacyForm()
+{
+	$form = new RegisterPharmacyForm();
+	echo $form->render();
+}
+
+function handleRegisterPharmacyFormSubmission()
+{
+	if ($_SERVER['REQUEST_METHOD'] === 'POST')
+	{
+		sanitizeForm();
+		$pharmacy = new Pharmacy([
+			"title" => $_POST['title'],
+			"locationAddress" => $_POST['locationAddress'],
+			"emailAddress" => $_POST['emailAddress'],
+			"phoneNumber" => $_POST['phoneNumber'],
+		]);
+		$pharmacy->save();
+	}
+}
+
+function renderRegisterPharmaceuticalForm()
+{
+	$form = new RegisterPharmaceuticalForm();
+	echo $form->render();
+}
+
+function handleRegisterPharmaceuticalFormSubmission()
+{
+	if ($_SERVER['REQUEST_METHOD'] === 'POST')
+	{
+		sanitizeForm();
+		$pharmaceutical = new Pharmaceutical([
+			"title" => $_POST['title'],
+			"locationAddress" => $_POST['locationAddress'],
+			"emailAddress" => $_POST['emailAddress'],
+			"phoneNumber" => $_POST['phoneNumber'],
+		]);
+		$pharmaceutical->save();
+	}
+}
+
+function renderSupplyItemEntryForm()
+{
+	$form = new SupplyItemEntryForm();
+	echo $form->render();
+}
+
+function handleSupplyItemEntryFormSubmission()
+{
+	if ($_SERVER['REQUEST_METHOD'] === 'POST')
+	{
+		sanitizeForm();
+		$supplyItem = new SupplyItem([
+			"contractSupplyId" => $_POST['contractSupplyId'],
+			"drugId" => $_POST['drugId'],
+			"tradeName" => $_POST['tradeName'],
+			"quantity" => $_POST['quantity'],
+			"costPrice" => $_POST['costPrice'],
+			"sellingPrice" => $_POST['sellingPrice']
+		]);
+		$supplyItem->save();
+	}
+}
+
 function renderRegisterPatientForm()
 {
 	$form = new RegisterPatientForm();
@@ -61,6 +149,24 @@ function handleRegisterPatientFormSubmission()
 	}
 }
 
+function renderRegisterSpecialtyForm()
+{
+	$form = new RegisterSpecialtyForm();
+	echo $form->render();
+}
+
+function handleRegisterSpecialtyFormSubmission()
+{
+	if ($_SERVER['REQUEST_METHOD'] === 'POST')
+	{
+		sanitizeForm();
+		$specialty = new Specialty([
+			'title' => $_POST['title'],
+			'description' => $_POST['description']
+		]);
+		$specialty->save();
+	}
+}
 function renderRegisterPractitionerForm()
 {
 	$form = new RegisterPractitionerForm();

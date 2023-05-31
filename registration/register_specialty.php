@@ -5,16 +5,25 @@ require_once "views.php";
 
 if ($_SERVER["REQUEST_METHOD"] === "POST")
 {
-	handleLoginFormSubmission();
+	handleRegisterSpecialtyFormSubmission();
 	header("Location: templates/main/homepage.php");
 	exit;
 }
 
-ob_start();
-renderLoginForm();
+# Set page header
+$content = <<<_HTML
+	<div class = "page-header">
+	<h3>Specialty Registration</h3>
+	</div>
+	_HTML;
 
-$content = ob_get_clean();
-$title = "Patient Login";
+# retrieve specialty registration form
+ob_start();
+renderRegisterSpecialtyForm();
+$content .= ob_get_clean();
+
+# set page title
+$title = "Specialty Registration";
 
 include "../templates/base.php";
 ?>

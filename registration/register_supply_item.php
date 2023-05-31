@@ -5,16 +5,25 @@ require_once "views.php";
 
 if ($_SERVER["REQUEST_METHOD"] === "POST")
 {
-	handleLoginFormSubmission();
+	handleSupplyItemEntryFormSubmission();
 	header("Location: templates/main/homepage.php");
 	exit;
 }
 
-ob_start();
-renderLoginForm();
+# Set page header
+$content = <<<_HTML
+	<div class = "page-header">
+	<h3>Supply Item Entry</h3>
+	</div>
+	_HTML;
 
-$content = ob_get_clean();
-$title = "Patient Login";
+# retrieve supply item entry form
+ob_start();
+renderSupplyItemEntryForm();
+$content .= ob_get_clean();
+
+# set page title
+$title = "Supply Item Entry";
 
 include "../templates/base.php";
 ?>

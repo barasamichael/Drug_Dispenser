@@ -37,4 +37,11 @@ class DatabaseHandler
 
 		return $success;
 	}
+
+	public function selectQuery($sql)
+	{
+		$result = $this->pdo->query($sql);
+		$result = $result->fetchAll();
+		return $result;
+	}
 }

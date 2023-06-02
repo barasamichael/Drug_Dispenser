@@ -6,7 +6,7 @@ require_once "views.php";
 if ($_SERVER["REQUEST_METHOD"] === "POST")
 {
 	handleRegisterSpecialtyFormSubmission();
-	header("Location: templates/main/homepage.php");
+	header("Location: register_specialty.php");
 	exit;
 }
 

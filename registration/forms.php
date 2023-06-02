@@ -347,6 +347,25 @@ class RegisterPractitionerForm extends CustomForm
 {
 	public function __construct()
 	{
+		// database credentials
+		$dsn = 'mysql:host=localhost; dbname=drugs_db';
+		$username = 'root';
+		$password = 'MySQLXXX-123a8910';
+
+		// Retrieve specialty details from database
+		$dbHandler = new DatabaseHandler($dsn, $username, $password);
+		$dbHandler->connect();
+		$specialty_result = $dbHandler->selectQuery(
+			'SELECT specialtyId, title FROM specialty');
+		$dbHandler->disconnect();
+
+		$specialties = [];
+		foreach ($specialty_result as $row)
+		{
+			$specialties[$row['specialtyId']] = $row['title'];
+		}
+
+		// set form fields
 		$SSN = new IntegerField([
 			"name" => "SSN",
 			"label" => "Social Security Number",
@@ -374,6 +393,17 @@ class RegisterPractitionerForm extends CustomForm
 				"Female" => "Female"
 			],
 			"value" => "Male"
+		]);
+		$specialtyId = new SelectField([
+			"name" => "specialtyId",
+			"label" => "Select Area of Specialty",
+			"required" => true,
+			"options" => $specialties
+		]);
+		$activeYear = new IntegerField([
+			"name" => "activeYear",
+			"label" => "Year Begun as Practitioner",
+			"required" => true
 		]);
 		$dateOfBirth = new DateField([
 			"name" => "dateOfBirth",
@@ -406,6 +436,8 @@ class RegisterPractitionerForm extends CustomForm
 		$this->addField($lastName);
 		$this->addField($gender);
 		$this->addField($dateOfBirth);
+		$this->addField($activeYear);
+		$this->addField($specialtyId);
 		$this->addField($emailAddress);
 		$this->addField($phoneNumber);
 		$this->addField($password);

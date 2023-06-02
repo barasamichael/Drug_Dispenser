@@ -41,7 +41,16 @@ class DatabaseHandler
 	public function selectQuery($sql)
 	{
 		$result = $this->pdo->query($sql);
-		$result = $result->fetchAll();
-		return $result;
+		if (!$result) {
+			$errorInfo = $this->pdo->errorInfo();
+			echo "Error executing the query: " . $errorInfo[2];
+		} else {
+			try {
+				return $result->fetchAll();
+			} catch (Exception $e) {
+				echo "Exception occurred: " . $e->getMessage();
+			}
+		}
+		return [];
 	}
 }

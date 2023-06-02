@@ -187,7 +187,9 @@ function handleRegisterPractitionerFormSubmission()
 			'dateOfBirth' => $_POST['dateOfBirth'],
 			'phoneNumber' => $_POST['phoneNumber'],
 			'emailAddress' => $_POST['emailAddress'],
-			'passwordHash' => $_POST['password']
+			'passwordHash' => $_POST['password'],
+			'specialtyId' => $_POST['specialtyId'],
+			'activeYear' => $_POST['activeYear']
 		]);
 		$practitioner->save();
 	}

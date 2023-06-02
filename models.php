@@ -46,6 +46,22 @@ class Practitioner extends Relation
 {
 	protected $__tablename__ = "practitioner";
 
+	private $practitionerId;
+	private $firstName;
+	private $middleName;
+	private $lastName;
+	private $gender;
+	private $dateOfBirth;
+	private $residentialAddress;
+	private $phoneNumber;
+	private $emailAddress;
+	private $passwordHash;
+	private $lastSeen;
+	private $SSN;
+	private $activeYear;
+	private $active;
+	private $dateCreated;
+	private $lastUpdated;
 
 	public function __construct(...$kwargs)
 	{

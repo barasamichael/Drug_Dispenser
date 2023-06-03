@@ -6,7 +6,7 @@ require_once('../connect.php');
 
 if ($_SERVER["REQUEST_METHOD"] === "POST")
 {
-	//handlePractitionerPractitionerAssignmentFormSubmission();
+	handlePractitionerPatientAssignmentFormSubmission();
 	header("Location: practitioner_profile.php");
 	exit;
 }
@@ -24,9 +24,13 @@ $practitioner_query = "SELECT * FROM practitioner WHERE practitionerId = 1";
 $specialty_query = "SELECT s.specialtyId, s.title FROM practitioner as p " .
 	"LEFT OUTER JOIN specialty as s USING (specialtyId) " .
 	"WHERE practitionerId = 1";
+$patients_query = "SELECT p.patientId, p.firstName, p.middleName, p.lastName, " .
+	"p.emailAddress, p.phoneNumber, pp.primaryPractitioner FROM patient_practitioner as pp " .
+	"LEFT OUTER JOIN patient AS p USING (patientId) WHERE pp.practitionerId = 1";
 
 $practitioner = $databaseHandler->selectQuery($practitioner_query);
 $specialty = $databaseHandler->selectQuery($specialty_query);
+$patients = $databaseHandler->selectQuery($patients_query);
 
 $databaseHandler->disconnect();
 
@@ -37,6 +41,70 @@ $specialty = $specialty[0];
 // set page title
 $title = $practitioner['firstName'] . " " . $practitioner['middleName'] . " " .
 	$practitioner['lastName'];
+
+// set practitioner patient assignment form
+ob_start();
+renderPractitionerPatientAssignmentForm();
+$form = ob_get_clean();
+
+$patient_assignment = <<<_HTML
+	<h3 class = "text-muted">New Patient Assignment</h3>
+	$form
+	_HTML;
+
+
+$patients_table_data = null;
+foreach ($patients as $patient)
+{
+	$patients_table_data .= <<<_HTML
+		<tr>
+		<td>{$patient['patientId']}</td>
+		<td>{$patient['firstName']} {$patient['middleName']} {$patient['lastName']}</td>
+		<td>{$patient['phoneNumber']}</td>
+		<td>{$patient['emailAddress']}</td>
+		_HTML;
+
+	if ($patient['primaryPractitioner'] == 1)
+	{
+		$patients_table_data .= <<<_HTML
+			<td style = "color : blue;">Primary</td>
+			_HTML;
+	}
+	else
+	{
+		$patients_table_data .= <<<_HTML
+			<td style = "color : brown;">Secondary</td>
+			_HTML;
+	}
+	$patients_table_data .= <<<_HTML
+		</tr>
+		_HTML;
+}
+
+$patients_table = <<<_HTML
+	<h3 class = "text-muted">Assigned Patients</h3>
+	<div class = "list-group">
+	<div class = "list-group-item">
+	<table class = "table table-hover table-striped table-responsive">
+	<thead class = "thead">
+	<tr>
+	<th>Patient Id</th>
+	<th>Patient Name</th>
+	<th>Phone Number</th>
+	<th>Email Address</th>
+	<th>Priority</th>
+	</tr>
+	</thead>
+	<tbody>
+	$patients_table_data
+	</tbody>
+	</table>
+	</div>
+	</div>
+	_HTML;
+
+$main_area = $patient_assignment;
+$main_area .= $patients_table;
 
 $content = <<<_HTML
 	<link href = "../bootstrap.min.css" rel = "stylesheet">

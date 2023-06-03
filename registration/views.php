@@ -45,11 +45,11 @@ function handleRegisterContractFormSubmission()
 	{
 		sanitizeForm();
 		$contract = new Contract([
-			"pharmaceuticalId" => $_POST['pharmaceuticalId'],
+			"pharmaceuticalId" => 1,
 			"startDate" => $_POST['startDate'],
 			"endDate" => $_POST['endDate'],
 			"description" => $_POST['description'],
-			"fileUrl" => $_POST['fileUrl'],
+			"fileUrl" => "contract.pdf",
 			"pharmacyId" => $_POST['pharmacyId']
 		]);
 		$contract->save();

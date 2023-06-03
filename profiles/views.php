@@ -32,4 +32,24 @@ function handlePatientPractitionerAssignmentFormSubmission()
 		$patientPractitioner->save();
 	}
 }
+
+function renderPractitionerPatientAssignmentForm()
+{
+	$form = new PractitionerPatientAssignmentForm();
+	echo $form->render();
+}
+
+function handlePractitionerPatientAssignmentFormSubmission()
+{
+	if ($_SERVER['REQUEST_METHOD'] === 'POST')
+	{
+		sanitizeForm();
+		$patientPractitioner = new PatientPractitioner([
+			"patientId" => $_POST['patientId'],
+			"practitionerId" => 1,
+			"primaryPractitioner" => $_POST['primaryPractitioner']
+		]);
+		$patientPractitioner->save();
+	}
+}
 ?>

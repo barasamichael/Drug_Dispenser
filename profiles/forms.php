@@ -106,4 +106,54 @@ class PractitionerPatientAssignmentForm extends CustomForm
 		$this->addField($submit);
 	}
 }
+
+class RegisterSupplyItemForm extends CustomForm
+{
+	public function __construct()
+	{
+		// database credentials
+		$dsn = 'mysql:host=localhost; dbname=drugs_db';
+		$username = 'root';
+		$password = 'MySQLXXX-123a8910';
+		
+		// Retrieve drugs from database
+		$dbHandler = new DatabaseHandler($dsn, $username, $password);
+		$dbHandler->connect();
+		$SQL_query = "SELECT DISTINCT drugId, scientificName FROM drug";
+		$drug_result = $dbHandler->selectQuery($SQL_query);
+		$dbHandler->disconnect();
+
+		$drugs = [];
+		foreach ($drug_result as $row)
+		{
+			$drugs[$row['drugId']] = $row['scientificName']; 
+		}
+
+		$drugId = new SelectField([
+			"name" => "drugId",
+			"label" => "Select Drug",
+			"required" => true,
+			"options" => $drugs
+		]);
+
+		$primaryPractitioner = new SelectField([
+			"name" => "primaryPractitioner",
+			"label" => "Select Priority Level",
+			"required" => true,
+			"options" => [
+				true => "Primary Practitioner",
+				false => "Secondary Practitioner"
+			]
+		]); 
+
+		$submit = new SubmitField([
+			"name" => "submit",
+			"label" => "Add to Order"
+		]);
+
+		$this->addField($patientId);
+		$this->addField($primaryPractitioner);
+		$this->addField($submit);
+	}
+}
 ?>

@@ -1,5 +1,4 @@
 <?php
-
 require_once('../connect.php');
 
 // database credentials
@@ -7,39 +6,39 @@ $dsn = 'mysql:host=localhost; dbname=drugs_db';
 $username = 'root';
 $password = 'MySQLXXX-123a8910';
 
-// Retrieve pharmaceutical details and associated from database
+// Retrieve pharmacy details and associated from database
 $databaseHandler = new DatabaseHandler($dsn, $username, $password);
 $databaseHandler->connect();
-$pharmaceutical_query = "SELECT * FROM pharmaceutical WHERE pharmaceuticalId = 1";
-$contracts_query = "SELECT c.contractId, c.startDate, c.endDate, c.pharmacyId, p.title, " .
+$pharmacy_query = "SELECT * FROM pharmacy WHERE pharmacyId = 1";
+$contracts_query = "SELECT c.contractId, c.startDate, c.endDate, c.pharmaceuticalId, p.title, " .
 	"p.emailAddress, p.locationAddress, p.phoneNumber FROM contract as c " .
-	"RIGHT OUTER JOIN pharmacy as p USING (pharmacyId) " .
-	"WHERE c.pharmaceuticalId = 1";
+	"RIGHT OUTER JOIN pharmaceutical as p USING (pharmaceuticalId) " .
+	"WHERE c.pharmacyId = 1";
 
-$pharmaceutical = $databaseHandler->selectQuery($pharmaceutical_query);
+$pharmacy = $databaseHandler->selectQuery($pharmacy_query);
 $contracts = $databaseHandler->selectQuery($contracts_query);
 
 $databaseHandler->disconnect();
 
-// Retrieve record of pharmaceutical from results
-$pharmaceutical = $pharmaceutical[0];
+// Retrieve record of pharmacy from results
+$pharmacy = $pharmacy[0];
 
 // set page title
-$title = $pharmaceutical['title'];
+$title = $pharmacy['title'];
 
 $company_image = <<<_HTML
 	<div class="image-container">
 	<div class="semi-circle"></div>
-	<img src = "https://bsmedia.business-standard.com/_media/bs/img/article/2019-12/21/full/1576948962-751.jpg" alt = "pharmaceutical image">
+	<img src = "https://bsmedia.business-standard.com/_media/bs/img/article/2019-12/21/full/1576948962-751.jpg" alt = "pharmacy image">
 	<div class="overlay">
 	<div class="overlay-text">
-	<p>Call Us: {$pharmaceutical['phoneNumber']}</p>
+	<p>Call Us: {$pharmacy['phoneNumber']}</p>
 	</div>
 	<div class="overlay-text">
-	<p>Email Us: {$pharmaceutical['emailAddress']}</p>
+	<p>Email Us: {$pharmacy['emailAddress']}</p>
 	</div>
 	<div class="overlay-text">
-	<p>{$pharmaceutical['locationAddress']}</p>
+	<p>{$pharmacy['locationAddress']}</p>
 	</div>
 	</div>
 	</div>
@@ -49,33 +48,33 @@ $company_information = <<<_HTML
 	<!-- comprehensive information -->
 	<div class="card" style = "margin: 0;">
 	<div class="card-header" style = "padding-left:50px;">
-	<h3 class = "text-center">{$pharmaceutical['title']}</h3>
+	<h3 class = "text-center">{$pharmacy['title']}</h3>
 	</div>
 	<div class="card-body">
 	<div class="card-item">
 	<i class="fas fa-building fa-icon"></i>
 	<span class = "item-name">Location Address</span>
-	<span class = "item-value">{$pharmaceutical['locationAddress']}</span>
+	<span class = "item-value">{$pharmacy['locationAddress']}</span>
 	</div>
 	<div class="card-item">
 	<i class="fas fa-envelope fa-icon"></i>
 	<span class = "item-name">Email Address</span>
-	<span class = "item-value">{$pharmaceutical['emailAddress']}</span>
+	<span class = "item-value">{$pharmacy['emailAddress']}</span>
 	</div>
 	<div class="card-item">
 	<i class="fas fa-phone fa-icon"></i>
 	<span class = "item-name">Contact</span>
-	<span class = "item-value">{$pharmaceutical['phoneNumber']}</span>
+	<span class = "item-value">{$pharmacy['phoneNumber']}</span>
 	</div>
 	<div class="card-item">
 	<i class="fas fa-toggle-on fa-icon"></i>
 	<span class = "item-name">Status</span>
-	<span class = "item-value" id = "active">{$pharmaceutical['active']}</span>
+	<span class = "item-value" id = "active">{$pharmacy['active']}</span>
 	</div>
 	<div class="card-item">
 	<i class="fas fa-calendar-check fa-icon"></i>
 	<span class = "item-name">Date Registered</span>
-	<span class = "item-value" id = "dateCreated">{$pharmaceutical['dateCreated']}</span>
+	<span class = "item-value" id = "dateCreated">{$pharmacy['dateCreated']}</span>
 	</div>
 	</div>
 	</div>
@@ -85,7 +84,7 @@ $contracts_section = <<<_HTML
 	<style>
 	.page-header h3 {
 	margin-top: 7%;
-	color: brown;
+	color: #FF8000;
 	font-weight: bold;
 	}
 	.contract {
@@ -108,6 +107,7 @@ $contracts_section = <<<_HTML
 	.btn {
 	font-size: 17px;
 	}
+
 	.btn-pill {
 	border-radius: 50px;
 	padding: 10px 20px;
@@ -130,7 +130,7 @@ foreach ($contracts as $contract)
 		</div>
 		<div class = "col-md-6 col-lg-6" style = "padding-top: 10px; padding-bottom: 10px; padding-left: 30px;">
 		<ul class = "list-unstyled lead">
-		<li><span class = "explanation">Pharmacy:</span> {$contract['title']}</li>
+		<li><span class = "explanation">Pharmaceutical:</span> {$contract['title']}</li>
 		<li><span class = "explanation">Email Address:</span> {$contract['emailAddress']}</li>
 		<li><span class = "explanation">Contact:</span> {$contract['phoneNumber']}</li>
 		<li>
@@ -180,7 +180,7 @@ $content = <<<_HTML
 	}
 
 	.card-header {
-	background-color: #FF8000;
+	background-color: brown;
 	color: #fff;
 	padding: 10px;
 	border-top-left-radius: 10px;
@@ -209,18 +209,18 @@ $content = <<<_HTML
 	display: flex;
 	align-items: center;
 	margin-bottom: 10px;
-	color: #FF8000;
+	color: brown;
 	color: #000;
 	font-size: 20px;
 	}
 
 	.card-item i {
 	margin-right: 10px;
-	color: #FF8000;
+	color: brown;
 	}
 
 	.item-name {
-	color: #FF8000;
+	color: brown;
 	font-weight: bold;
 	}
 
@@ -311,7 +311,7 @@ $content = <<<_HTML
 	}
 
 	.btn-update {
-	background-color: #FF8000;
+	background-color: brown;
 	color: #fff;
 	}
 
@@ -322,11 +322,6 @@ $content = <<<_HTML
 	.btn-profile-info{
 	width: 55%;
 	float: right;
-	}
-
-	.btn-contract {
-	width: 100%;
-	margin-top:2%;
 	}
 	</style>
 		<link href = "../bootstrap.min.css" rel = "stylesheet">
@@ -341,9 +336,6 @@ $content = <<<_HTML
 		<div class = "update-info">
 		<a href = "" class = "btn btn-update btn-profile-image">Update Profile Image</a>
 		<a href = "" class = "btn btn-update btn-profile-info">Update Profile Information</a>
-		<div>
-		<a href = "../registration/register_contract.php" class = "btn btn-primary btn-contract btn-large">Create New Contract</a>
-		</div>
 		</div>
 		<div>
 		$contracts_section

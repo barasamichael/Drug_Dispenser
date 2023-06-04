@@ -110,9 +110,9 @@ function handleSupplyItemEntryFormSubmission()
 	{
 		sanitizeForm();
 		$supplyItem = new SupplyItem([
-			"contractSupplyId" => $_POST['contractSupplyId'],
+			"contractSupplyId" => 3,
 			"drugId" => $_POST['drugId'],
-			"tradeName" => $_POST['tradeName'],
+			"tradename" => $_POST['tradename'],
 			"quantity" => $_POST['quantity'],
 			"costPrice" => $_POST['costPrice'],
 			"sellingPrice" => $_POST['sellingPrice']

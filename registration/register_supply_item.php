@@ -6,8 +6,8 @@ require_once "views.php";
 if ($_SERVER["REQUEST_METHOD"] === "POST")
 {
 	handleSupplyItemEntryFormSubmission();
-	header("Location: templates/main/homepage.php");
-	exit;
+	//header("Location: register_supply_item.php");
+	//exit;
 }
 
 # Set page header

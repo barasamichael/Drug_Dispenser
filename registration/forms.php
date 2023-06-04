@@ -193,20 +193,11 @@ class SupplyItemEntryForm extends CustomForm
 		$dbHandler->connect();
 
 		// retrieve data from database
-		$contract_supply_result = $dbHandler->selectQuery(
-			'SELECT contractSupplyId FROM contract_supply');
-		$drugs_result = $dbHandler->selectQuery(
-			"SELECT drugId, scientificName FROM drug");
+		$drugs_result = $dbHandler->selectQuery("SELECT drugId, scientificName FROM drug");
 
 		$dbHandler->disconnect();
 
 		// place retrieved data into array
-		$contract_supplies = [];
-		foreach ($contract_supply_result as $row)
-		{
-			$contract_supplies[$row['contractSupplyId']] = $row['contractSupplyId'];
-		}
-
 		$drugs = [];
 		foreach ($drugs_result as $row)
 		{
@@ -214,13 +205,6 @@ class SupplyItemEntryForm extends CustomForm
 		}
 
 		// set form fields
-		$contractSupplyId = new SelectField([
-			"name" => "contractSupplyId",
-			"label" => "Select Contract Supply",
-			"required" => true,
-			"options" => $contract_supplies
-		]);
-
 		$drugId = new SelectField([
 			"name" => "drugId",
 			"label" => "Select Drug",
@@ -228,8 +212,8 @@ class SupplyItemEntryForm extends CustomForm
 			"options" => $drugs
 		]);
 
-		$tradeName = new StringField([
-			"name" => "tradeName",
+		$tradename = new StringField([
+			"name" => "tradename",
 			"label" => "Trade Name",
 			"required" => true
 		]);
@@ -257,9 +241,8 @@ class SupplyItemEntryForm extends CustomForm
 			"label" => "Register"
 		]);
 
-		$this->addField($contractSupplyId);
 		$this->addField($drugId);
-		$this->addField($tradeName);
+		$this->addField($tradename);
 		$this->addField($quantity);
 		$this->addField($costPrice);
 		$this->addField($sellingPrice);

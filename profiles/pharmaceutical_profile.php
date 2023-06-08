@@ -2,6 +2,8 @@
 
 require_once('../connect.php');
 
+$pharmaceuticalId = $_GET['pharmaceuticalId'];
+
 // database credentials
 $dsn = 'mysql:host=localhost; dbname=drugs_db';
 $username = 'root';
@@ -10,11 +12,12 @@ $password = 'MySQLXXX-123a8910';
 // Retrieve pharmaceutical details and associated from database
 $databaseHandler = new DatabaseHandler($dsn, $username, $password);
 $databaseHandler->connect();
-$pharmaceutical_query = "SELECT * FROM pharmaceutical WHERE pharmaceuticalId = 1";
+$pharmaceutical_query = "SELECT * FROM pharmaceutical WHERE pharmaceuticalId = " .
+	"$pharmaceuticalId";
 $contracts_query = "SELECT c.contractId, c.startDate, c.endDate, c.pharmacyId, p.title, " .
 	"p.emailAddress, p.locationAddress, p.phoneNumber FROM contract as c " .
 	"RIGHT OUTER JOIN pharmacy as p USING (pharmacyId) " .
-	"WHERE c.pharmaceuticalId = 1";
+	"WHERE c.pharmaceuticalId = $pharmaceuticalId";
 
 $pharmaceutical = $databaseHandler->selectQuery($pharmaceutical_query);
 $contracts = $databaseHandler->selectQuery($contracts_query);
@@ -36,7 +39,8 @@ $company_image = <<<_HTML
 	<p>Call Us: {$pharmaceutical['phoneNumber']}</p>
 	</div>
 	<div class="overlay-text">
-	<p>Email Us: {$pharmaceutical['emailAddress']}</p>
+	<p>
+	Email Us: {$pharmaceutical['emailAddress']}</p>
 	</div>
 	<div class="overlay-text">
 	<p>{$pharmaceutical['locationAddress']}</p>
@@ -45,6 +49,8 @@ $company_image = <<<_HTML
 	</div>
 	_HTML;
 
+$locationAddress = urlencode($pharmaceutical['locationAddress']);
+$googleSearchUrl = "https://www.google.com/maps/search/?api=1&query={$locationAddress}";
 $company_information = <<<_HTML
 	<!-- comprehensive information -->
 	<div class="card" style = "margin: 0;">
@@ -55,17 +61,29 @@ $company_information = <<<_HTML
 	<div class="card-item">
 	<i class="fas fa-building fa-icon"></i>
 	<span class = "item-name">Location Address</span>
-	<span class = "item-value">{$pharmaceutical['locationAddress']}</span>
+	<span class = "item-value">
+	<a href = "{$googleSearchUrl}" target = "_blank">
+	{$pharmaceutical['locationAddress']}
+	</a>
+	</span>
 	</div>
 	<div class="card-item">
 	<i class="fas fa-envelope fa-icon"></i>
 	<span class = "item-name">Email Address</span>
-	<span class = "item-value">{$pharmaceutical['emailAddress']}</span>
+	<span class = "item-value">
+	<a href = "mailto: {$pharmaceutical['emailAddress']}">
+	{$pharmaceutical['emailAddress']}
+	</a>
+	</span>
 	</div>
 	<div class="card-item">
 	<i class="fas fa-phone fa-icon"></i>
 	<span class = "item-name">Contact</span>
-	<span class = "item-value">{$pharmaceutical['phoneNumber']}</span>
+	<span class = "item-value">
+	<a href = "tel: {$pharmaceutical['phoneNumber']}">
+	{$pharmaceutical['phoneNumber']}
+	</a>
+	</span>
 	</div>
 	<div class="card-item">
 	<i class="fas fa-toggle-on fa-icon"></i>
@@ -146,7 +164,9 @@ foreach ($contracts as $contract)
 		<span id = "period-{$unique_id}"></span>
 		</li>
 		</ul>
-		<a class = "btn btn-primary btn-pill">View Details</a>
+		<a href = "contract_profile.php?contractId={$contract['contractId']}" class = "btn btn-primary btn-pill">
+		View Details
+		</a>
 		</div>
 		</div>
 		</div>

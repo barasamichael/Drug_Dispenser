@@ -132,8 +132,17 @@
 				<li><a href="">Gallery</a></li>
 			</ul>
 			<div class="auth-links">
-				<a href="">Sign In</a>
-				<a href="">Sign Up</a>
+				<?php 
+				if (isset($_SESSION['logged_in']) && $_SESSION['logged_in']===true)
+				{
+					echo "<a href='../authentication/logout.php'>Sign Out</a>";
+				}
+				else
+				{
+					echo "<a href='../authentication/login.php'>Sign In</a>";
+					echo "<a href='../registration/register_patient.php'>Sign Up</a>";
+				}
+				?>
 			</div>
 		</nav>
 		<hr>

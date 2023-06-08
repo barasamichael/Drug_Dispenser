@@ -33,13 +33,35 @@ $content .= <<<_HTML
 // populate table rows with data
 foreach ($result as $row)
 {
+	$residentialAddress = urlencode($row['locationAddress']);
+	$googleSearchUrl = "https://www.google.com/maps/search/?api=1&query={$residentialAddress}";
 	$content .= <<<_HTML
 		<tr>
-		<td>{$row['pharmaceuticalId']}</td>
-		<td>{$row['title']}</td>
-		<td>{$row['emailAddress']}</td>
-		<td>{$row['phoneNumber']}</td>
-		<td>{$row['locationAddress']}</td>
+		<td>
+		<a href = "pharmaceutical_profile.php?pharmaceuticalId={$row['pharmaceuticalId']}">
+		{$row['pharmaceuticalId']}
+		</a>
+		</td>
+		<td>
+		<a href = "pharmaceutical_profile.php?pharmaceuticalId={$row['pharmaceuticalId']}">
+		{$row['title']}
+		</a>
+		</td>
+		<td>
+		<a href = "mailto: {$row['emailAddress']}">
+		{$row['emailAddress']}
+		</a>
+		</td>
+		<td>
+		<a href = "tel: {$row['phoneNumber']}">
+		{$row['phoneNumber']}
+		</a>
+		</td>
+		<td>
+		<a href = "{$googleSearchUrl}" target = "_blank">
+		{$row['locationAddress']}
+		</a>
+		</td>
 		</tr>
 		_HTML;
 }

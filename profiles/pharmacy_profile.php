@@ -1,5 +1,6 @@
 <?php
 require_once('../connect.php');
+$pharmacyId = $_GET['pharmacyId'];
 
 // database credentials
 $dsn = 'mysql:host=localhost; dbname=drugs_db';
@@ -9,11 +10,11 @@ $password = 'MySQLXXX-123a8910';
 // Retrieve pharmacy details and associated from database
 $databaseHandler = new DatabaseHandler($dsn, $username, $password);
 $databaseHandler->connect();
-$pharmacy_query = "SELECT * FROM pharmacy WHERE pharmacyId = 1";
+$pharmacy_query = "SELECT * FROM pharmacy WHERE pharmacyId = $pharmacyId";
 $contracts_query = "SELECT c.contractId, c.startDate, c.endDate, c.pharmaceuticalId, p.title, " .
 	"p.emailAddress, p.locationAddress, p.phoneNumber FROM contract as c " .
 	"RIGHT OUTER JOIN pharmaceutical as p USING (pharmaceuticalId) " .
-	"WHERE c.pharmacyId = 1";
+	"WHERE c.pharmacyId = $pharmacyId";
 
 $pharmacy = $databaseHandler->selectQuery($pharmacy_query);
 $contracts = $databaseHandler->selectQuery($contracts_query);
@@ -44,6 +45,8 @@ $company_image = <<<_HTML
 	</div>
 	_HTML;
 
+$locationAddress = urlencode($pharmacy['locationAddress']);
+$googleSearchUrl = "https://www.google.com/maps/search/?api=1&query={$locationAddress}";
 $company_information = <<<_HTML
 	<!-- comprehensive information -->
 	<div class="card" style = "margin: 0;">
@@ -54,17 +57,29 @@ $company_information = <<<_HTML
 	<div class="card-item">
 	<i class="fas fa-building fa-icon"></i>
 	<span class = "item-name">Location Address</span>
-	<span class = "item-value">{$pharmacy['locationAddress']}</span>
+	<span class = "item-value">
+	<a href = "{$googleSearchUrl}" target = "_blank">
+	{$pharmacy['locationAddress']}
+	</a>
+	</span>
 	</div>
 	<div class="card-item">
 	<i class="fas fa-envelope fa-icon"></i>
 	<span class = "item-name">Email Address</span>
-	<span class = "item-value">{$pharmacy['emailAddress']}</span>
+	<span class = "item-value">
+	<a href = "mailto: {$patient['emailAddress']}">
+	{$pharmacy['emailAddress']}
+	</a>
+	</span>
 	</div>
 	<div class="card-item">
 	<i class="fas fa-phone fa-icon"></i>
 	<span class = "item-name">Contact</span>
-	<span class = "item-value">{$pharmacy['phoneNumber']}</span>
+	<span class = "item-value">
+	<a href = "tel: {$pharmacy['phoneNumber']}">
+	{$pharmacy['phoneNumber']}
+	</a>
+	</span>
 	</div>
 	<div class="card-item">
 	<i class="fas fa-toggle-on fa-icon"></i>
@@ -146,7 +161,9 @@ foreach ($contracts as $contract)
 		<span id = "period-{$unique_id}"></span>
 		</li>
 		</ul>
-		<a class = "btn btn-primary btn-pill">View Details</a>
+		<a href = "contract_profile.php?contractId={$contract['contractId']}" class = "btn btn-primary btn-pill">
+		View Details
+		</a>
 		</div>
 		</div>
 		</div>

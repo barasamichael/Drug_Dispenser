@@ -1,7 +1,7 @@
 <?php
 require_once('../connect.php');
 
-$contractSupplyId = $_GET['contractSupplyId'];
+$prescriptionId = $_GET['prescriptionId'];
 
 // database credentials
 $dsn = 'mysql:host=localhost; dbname=drugs_db';
@@ -12,13 +12,13 @@ $password = 'MySQLXXX-123a8910';
 $databaseHandler = new DatabaseHandler($dsn, $username, $password);
 $databaseHandler->connect();
 
-$update_query = "UPDATE contract_supply SET paymentComplete = :paymentComplete " .
-	"WHERE contractSupplyId = :contractSupplyId";
-$attributes = ["paymentComplete" => 1, "contractSupplyId" => $contractSupplyId];
+$update_query = "UPDATE prescription SET assigned = :assigned " .
+	"WHERE prescriptionId = :prescriptionId";
+$attributes = ["assigned" => 1, "prescriptionId" => $prescriptionId];
 
 $databaseHandler->executeQuery($update_query, $attributes);
 $databaseHandler->disconnect();
 
-header("Location: contract_supply_profile.php");
+header("Location: patient_profile.php");
 exit;
 ?>

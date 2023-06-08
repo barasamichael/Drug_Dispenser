@@ -45,12 +45,65 @@ class PatientPractitionerAssignmentForm extends CustomForm
 		]); 
 
 		$submit = new SubmitField([
-			"name" => "submit",
+			"name" => "patient-practitioner-assignment",
 			"label" => "Submit"
 		]);
 
 		$this->addField($practitionerId);
 		$this->addField($primaryPractitioner);
+		$this->addField($submit);
+	}
+}
+
+class PrescriptionAssignmentForm extends CustomForm
+{
+	public function __construct()
+	{
+		// database credentials
+		$dsn = 'mysql:host=localhost; dbname=drugs_db';
+		$username = 'root';
+		$password = 'MySQLXXX-123a8910';
+		
+		// Retrieve unassigned patients from database
+		$dbHandler = new DatabaseHandler($dsn, $username, $password);
+		$dbHandler->connect();
+		$SQL_query = "SELECT supplyItemId, tradename FROM supply_item";
+		$supply_items_result = $dbHandler->selectQuery($SQL_query);
+		$dbHandler->disconnect();
+
+		$supply_items = [];
+		foreach ($supply_items_result as $row)
+		{
+			$supply_items[$row['supplyItemId']] = $row['tradename'];
+		}
+
+		$supplyItemId = new SelectField([
+			"name" => "supplyItemId",
+			"label" => "Select Drug",
+			"required" => true,
+			"options" => $supply_items
+		]);
+		
+		$quantity = new IntegerField([
+			"name" => "quantity",
+			"label" => "Quantity",
+			"required" => true,
+		]);
+
+		$frequency = new StringField([
+			"name" => "frequency",
+			"label" => "Frequency",
+			"required" => true,
+		]);
+
+		$submit = new SubmitField([
+			"name" => "prescription-assignment",
+			"label" => "Submit"
+		]);
+
+		$this->addField($supplyItemId);
+		$this->addField($quantity);
+		$this->addField($frequency);
 		$this->addField($submit);
 	}
 }

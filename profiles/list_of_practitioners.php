@@ -35,10 +35,26 @@ foreach ($result as $row)
 {
 	$content .= <<<_HTML
 		<tr>
-		<td>{$row['practitionerId']}</td>
-		<td>{$row['firstName']} {$row['middleName']} {$row['lastName']}</td>
-		<td>{$row['emailAddress']}</td>
-		<td>{$row['phoneNumber']}</td>
+		<td>
+		<a href = "practitioner_profile.php?practitionerId={$row['practitionerId']}">
+		{$row['practitionerId']}
+		</a>
+		</td>
+		<td>
+		<a href = "practitioner_profile.php?practitionerId={$row['practitionerId']}">
+		{$row['firstName']} {$row['middleName']} {$row['lastName']}
+		</a>
+		</td>
+		<td>
+		<a href = "mailto: {$row['emailAddress']}">
+		{$row['emailAddress']}
+		</a>
+		</td>
+		<td>
+		<a href = "tel: {$row['phoneNumber']}">
+		{$row['phoneNumber']}
+		</a>
+		</td>
 		<td>{$row['SSN']}</td>
 		</tr>
 		_HTML;

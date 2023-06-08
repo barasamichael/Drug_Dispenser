@@ -34,19 +34,27 @@ $supply = $supply[0];
 // set page title
 $title = "Supply Profile | Supply ID " . $supply['contractSupplyId'];
 
+$unique_id = 1;
 $supply_items_table_data = null;
 foreach ($supply_items as $item) {
 	$supply_items_table_data .= <<<_HTML
 		<tr>
 		<td>{$item['supplyItemId']}</td>
-		<td class = "dateCreated">{$item['dateCreated']}</td>
+		<td id = "dateCreated{$unique_id}">{$item['dateCreated']}</td>
 		<td>{$item['scientificName']}</td>
 		<td>{$item['tradename']}</td>
 		<td>{$item['quantity']}</td>
 		<td>{$item['costPrice']}</td>
 		<td>{$item['sellingPrice']}</td>
 		</tr>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+		<script>
+			var dateCreated = document.getElementById("dateCreated{$unique_id}");
+			dateCreated.innerText = moment(dateCreated.innerText).format(
+				'dddd MMMM D, YYYY h:mm A');
+		</script>
 		_HTML;
+	$unique_id += 1;
 }
 	
 $content = <<<_HTML

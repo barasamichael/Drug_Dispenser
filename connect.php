@@ -38,18 +38,39 @@ class DatabaseHandler
 		return $success;
 	}
 
-	public function selectQuery($sql)
+	public function selectQuery($sql, $attributes = [])
 	{
-		$result = $this->pdo->query($sql);
-		if (!$result) {
-			$errorInfo = $this->pdo->errorInfo();
-			echo "Error executing the query: " . $errorInfo[2];
-		} else {
-			try {
-				return $result->fetchAll();
-			} catch (Exception $e) {
-				echo "Exception occurred: " . $e->getMessage();
+		try
+		{
+			if (!empty($attributes))
+			{
+				$statement = $this->pdo->prepare($sql);
+				if (!$statement)
+				{
+					$errorInfo = $this->pdo->errorInfo();
+					throw new Exception("Error preparing the statement: " . $errorInfo[2]);
+				}
+				if (!$statement->execute($attributes))
+				{
+					$errorInfo = $statement->errorInfo();
+					throw new Exception("Error executing the prepared statement: " . $errorInfo[2]);
+				}
+				return $statement->fetchAll();
 			}
+			else
+			{
+				$result = $this->pdo->query($sql);
+				if (!$result)
+				{
+					$errorInfo = $this->pdo->errorInfo();
+					throw new Exception("Error executing the query: " . $errorInfo[2]);
+				}
+				return $result->fetchAll();
+			}
+		}
+		catch (Exception $e)
+		{
+			echo "Exception occurred: " . $e->getMessage();
 		}
 		return [];
 	}

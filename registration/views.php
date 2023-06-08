@@ -141,7 +141,7 @@ function handleRegisterPatientFormSubmission()
 			'residentialAddress' => $_POST['residentialAddress'],
 			'phoneNumber' => $_POST['phoneNumber'],
 			'emailAddress' => $_POST['emailAddress'],
-			'passwordHash' => $_POST['password'],
+			'passwordHash' => password_hash($_POST['password'], PASSWORD_DEFAULT),
 			'lastSeen' => $_POST['lastSeen'],
 			'SSN' => $_POST['SSN']
 		]);

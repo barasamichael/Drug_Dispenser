@@ -259,7 +259,7 @@ class Prescription extends Relation
 	private $prescriptionId;
 	private $quantity;
 	private $frequency;
-	private $practitionerId;
+	private $patientPractitionerId;
 	private $supplyItemId;
 	private $assigned;
 	private $dateCreated;

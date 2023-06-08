@@ -17,6 +17,18 @@ class LoginForm extends CustomForm
 			"label" => "Password",
 			"required" => true
 		]);
+
+		$user = new SelectField([
+			"name" => "user",
+			"label" => "Select User",
+			"required" => true,
+			"options" => [
+				"Patient" => "Patient",
+				"Practitioner" => "Practitioner",
+				"Pharmacy" => "Pharmacy",
+				"Pharmaceutical" => "Pharmaceutical"
+			]
+		]);
 	
 		$rememberMe = new CheckButtonField([
 			"name" => "remember_me",
@@ -30,6 +42,7 @@ class LoginForm extends CustomForm
 	
 		$this->addField($emailAddress);
 		$this->addField($password);
+		$this->addField($user);
 		$this->addField($rememberMe);
 		$this->addField($submit);
 	}

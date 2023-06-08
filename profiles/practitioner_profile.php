@@ -4,10 +4,12 @@ require_once("forms.php");
 require_once("views.php");
 require_once('../connect.php');
 
+$practitionerId = $_GET['practitionerId'];
+
 if ($_SERVER["REQUEST_METHOD"] === "POST")
 {
 	handlePractitionerPatientAssignmentFormSubmission();
-	header("Location: practitioner_profile.php");
+	header("Location: practitioner_profile.php?practitionerId=" . $_SESSION['practitionerId']);
 	exit;
 }
 
@@ -20,13 +22,15 @@ $password = 'MySQLXXX-123a8910';
 $databaseHandler = new DatabaseHandler($dsn, $username, $password);
 $databaseHandler->connect();
 
-$practitioner_query = "SELECT * FROM practitioner WHERE practitionerId = 1";
+$practitioner_query = "SELECT * FROM practitioner WHERE practitionerId = " .
+	"$practitionerId";
 $specialty_query = "SELECT s.specialtyId, s.title FROM practitioner as p " .
 	"LEFT OUTER JOIN specialty as s USING (specialtyId) " .
-	"WHERE practitionerId = 1";
+	"WHERE practitionerId = $practitionerId";
 $patients_query = "SELECT p.patientId, p.firstName, p.middleName, p.lastName, " .
 	"p.emailAddress, p.phoneNumber, pp.primaryPractitioner FROM patient_practitioner as pp " .
-	"LEFT OUTER JOIN patient AS p USING (patientId) WHERE pp.practitionerId = 1";
+	"LEFT OUTER JOIN patient AS p USING (patientId) WHERE pp.practitionerId = " .
+	"$practitionerId";
 
 $practitioner = $databaseHandler->selectQuery($practitioner_query);
 $specialty = $databaseHandler->selectQuery($specialty_query);
@@ -58,10 +62,24 @@ foreach ($patients as $patient)
 {
 	$patients_table_data .= <<<_HTML
 		<tr>
-		<td>{$patient['patientId']}</td>
-		<td>{$patient['firstName']} {$patient['middleName']} {$patient['lastName']}</td>
-		<td>{$patient['phoneNumber']}</td>
-		<td>{$patient['emailAddress']}</td>
+		<td>
+		<a href = "patient_profile.php?patientId={$patient['patientId']}">
+		{$patient['patientId']}
+		</a>
+		</td>
+		<td>
+		<a href = "patient_profile.php?patientId={$patient['patientId']}">
+		{$patient['firstName']} {$patient['middleName']} {$patient['lastName']}</td>
+		</a>
+		<td>
+		<a href = "tel: {$patient['phoneNumber']}">
+		{$patient['phoneNumber']}
+		</a>
+		</td>
+		<td>
+		<a href = "mailto: {$patient['emailAddress']}">
+		{$patient['emailAddress']}</td>
+		</a>
 		_HTML;
 
 	if ($patient['primaryPractitioner'] == 1)
@@ -181,6 +199,12 @@ $content = <<<_HTML
 	.item-value {
 	margin-left: auto;
 	}
+	
+	.img {
+	display: block;
+	margin-left: auto;
+	margin-right: auto;
+	}
 	</style>
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js">
@@ -200,7 +224,7 @@ $content = <<<_HTML
 	</div>
 
 	<!-- comprehensive information -->
-	<div class="card" style = >
+	<div class="card">
 	<div class="card-header" style = "padding-left:50px;">
 	<h4>Personal Details</h4>
 	</div>

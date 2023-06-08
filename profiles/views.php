@@ -13,6 +13,28 @@ function sanitizeForm()
 	}
 }
 
+function renderPrescriptionAssignmentForm()
+{
+	$form = new PrescriptionAssignmentForm();
+	echo $form->render();
+}
+
+function handlePrescriptionAssignmentFormSubmission($patientPractitionerId)
+{
+	if ($_SERVER['REQUEST_METHOD'] === 'POST')
+	{
+		sanitizeForm();
+		$prescription = new Prescription([
+			"patientPractitionerId" => $patientPractitionerId,
+			"frequency" => $_POST['frequency'],
+			"quantity" => $_POST['quantity'],
+			"supplyItemId" => $_POST['supplyItemId'],
+		]);
+		print_r($prescription);
+		$prescription->save();
+	}
+}
+
 function renderPatientPractitionerAssignmentForm()
 {
 	$form = new PatientPractitionerAssignmentForm();
@@ -26,7 +48,7 @@ function handlePatientPractitionerAssignmentFormSubmission()
 		sanitizeForm();
 		$patientPractitioner = new PatientPractitioner([
 			"practitionerId" => $_POST['practitionerId'],
-			"patientId" => 1,
+			"patientId" => $_SESSION['patientId'],
 			"primaryPractitioner" => $_POST['primaryPractitioner']
 		]);
 		$patientPractitioner->save();
@@ -46,7 +68,7 @@ function handlePractitionerPatientAssignmentFormSubmission()
 		sanitizeForm();
 		$patientPractitioner = new PatientPractitioner([
 			"patientId" => $_POST['patientId'],
-			"practitionerId" => 1,
+			"practitionerId" => $_SESSION['practitionerId'],
 			"primaryPractitioner" => $_POST['primaryPractitioner']
 		]);
 		$patientPractitioner->save();

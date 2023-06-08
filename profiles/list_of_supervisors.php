@@ -37,8 +37,16 @@ foreach ($result as $row)
 		<tr>
 		<td>{$row['supervisorId']}</td>
 		<td>{$row['firstName']} {$row['middleName']} {$row['lastName']}</td>
-		<td>{$row['emailAddress']}</td>
-		<td>{$row['phoneNumber']}</td>
+		<td>
+		<a href = "mailto: {$row['emailAddress']}">
+		{$row['emailAddress']}
+		</a>
+		</td>
+		<td>
+		<a href = "tel: {$row['phoneNumber']}">
+		{$row['phoneNumber']}
+		</a>
+		</td>
 		_HTML;
 
 	if ($row['active'] == 1)

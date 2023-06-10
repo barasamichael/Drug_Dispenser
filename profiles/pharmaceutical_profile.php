@@ -2,6 +2,7 @@
 
 require_once('../connect.php');
 
+session_start();
 $pharmaceuticalId = $_GET['pharmaceuticalId'];
 
 // database credentials

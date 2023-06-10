@@ -1,6 +1,7 @@
 <?php
 require_once('../connect.php');
 
+session_start();
 $contractId = $_GET['contractId'];
 
 // database credentials

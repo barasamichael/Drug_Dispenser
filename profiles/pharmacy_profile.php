@@ -1,5 +1,7 @@
 <?php
 require_once('../connect.php');
+
+session_start();
 $pharmacyId = $_GET['pharmacyId'];
 
 // database credentials
@@ -67,7 +69,7 @@ $company_information = <<<_HTML
 	<i class="fas fa-envelope fa-icon"></i>
 	<span class = "item-name">Email Address</span>
 	<span class = "item-value">
-	<a href = "mailto: {$patient['emailAddress']}">
+	<a href = "mailto: {$pharmacy['emailAddress']}">
 	{$pharmacy['emailAddress']}
 	</a>
 	</span>

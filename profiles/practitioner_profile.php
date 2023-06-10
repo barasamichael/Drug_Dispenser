@@ -4,6 +4,7 @@ require_once("forms.php");
 require_once("views.php");
 require_once('../connect.php');
 
+session_start();
 $practitionerId = $_GET['practitionerId'];
 
 if ($_SERVER["REQUEST_METHOD"] === "POST")
@@ -55,7 +56,6 @@ $patient_assignment = <<<_HTML
 	<h3 class = "text-muted">New Patient Assignment</h3>
 	$form
 	_HTML;
-
 
 $patients_table_data = null;
 foreach ($patients as $patient)

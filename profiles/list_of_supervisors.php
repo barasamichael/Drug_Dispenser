@@ -35,8 +35,16 @@ foreach ($result as $row)
 {
 	$content .= <<<_HTML
 		<tr>
-		<td>{$row['supervisorId']}</td>
-		<td>{$row['firstName']} {$row['middleName']} {$row['lastName']}</td>
+		<td>
+		<a href = "supervisor_profile.php?supervisorId={$row['supervisorId']}">
+		{$row['supervisorId']}
+		</a>
+		</td>
+		<td>
+		<a href = "supervisor_profile.php?supervisorId={$row['supervisorId']}">
+		{$row['firstName']} {$row['middleName']} {$row['lastName']}
+		</a>
+		</td>
 		<td>
 		<a href = "mailto: {$row['emailAddress']}">
 		{$row['emailAddress']}

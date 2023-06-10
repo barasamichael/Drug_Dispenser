@@ -3,6 +3,45 @@
 require_once(__DIR__ . "/../custom_form.php");
 require_once(__DIR__ . "/../fields.php");
 
+class ContractSupervisorAssignmentForm extends CustomForm
+{
+	public function __construct()
+	{
+		// database credentials
+		$dsn = 'mysql:host=localhost; dbname=drugs_db';
+		$username = 'root';
+		$password = 'MySQLXXX-123a8910';
+		
+		// Retrieve unassigned practitioners from database
+		$dbHandler = new DatabaseHandler($dsn, $username, $password);
+		$dbHandler->connect();
+		$SQL_query = "SELECT contractId FROM contract";
+		$contract_result = $dbHandler->selectQuery($SQL_query);
+		$dbHandler->disconnect();
+
+		$contracts = [];
+		foreach ($contract_result as $row)
+		{
+			$contracts[$row['contractId']] = "Contract ID: " . $row['contractId']; 
+		}
+
+		$contractId = new SelectField([
+			"name" => "contractId",
+			"label" => "Select Contract",
+			"required" => true,
+			"options" => $contracts
+		]);
+
+		$submit = new SubmitField([
+			"name" => "patient-practitioner-assignment",
+			"label" => "Submit"
+		]);
+
+		$this->addField($contractId);
+		$this->addField($submit);
+	}
+}
+
 class PatientPractitionerAssignmentForm extends CustomForm
 {
 	public function __construct()

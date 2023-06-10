@@ -25,6 +25,7 @@ class LoginForm extends CustomForm
 			"options" => [
 				"Patient" => "Patient",
 				"Practitioner" => "Practitioner",
+				"Supervisor" => "Supervisor",
 				"Pharmacy" => "Pharmacy",
 				"Pharmaceutical" => "Pharmaceutical"
 			]

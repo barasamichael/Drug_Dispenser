@@ -132,6 +132,7 @@ function handleLoginFormSubmission()
 				$_SESSION['middleName'] = $patient['middleName'];
 				$_SESSION['lastName'] = $patient['lastName'];
 				$_SESSION['emailAddress'] = $patient['emailAddress'];
+				$_SESSION['role'] = 'patient';
 
 				// alert message
 				header("Location: ../profiles/patient_profile.php" .
@@ -141,9 +142,9 @@ function handleLoginFormSubmission()
 			break;
 
 		case "Practitioner":
-			$sql_query = "SELECT * FROM practitioner WHERE emailAddress = " .
-				$emailAddress;
-			$practitioner_result = $dbHandler->selectQuery($sql_query);
+			$sql_query = "SELECT * FROM practitioner WHERE emailAddress=:emailAddress";
+			$practitioner_result = $dbHandler->selectQuery($sql_query, 
+				["emailAddress" => $emailAddress]);
 			$dbHandler->disconnect();
 			
 			if (!$practitioner_result[0])
@@ -162,6 +163,7 @@ function handleLoginFormSubmission()
 				$_SESSION['middleName'] = $practitioner['middleName'];
 				$_SESSION['lastName'] = $practitioner['lastName'];
 				$_SESSION['emailAddress'] = $practitioner['emailAddress'];
+				$_SESSION['role'] = 'practitioner';
 
 				// alert message
 				header("Location: ../profiles/practitioner_profile.php" .
@@ -171,9 +173,9 @@ function handleLoginFormSubmission()
 			break;
 
 		case "Pharmacy":
-			$sql_query = "SELECT * FROM pharmacy WHERE emailAddress = " .
-				$emailAddress;
-			$pharmacy_result = $dbHandler->selectQuery($sql_query);
+			$sql_query = "SELECT * FROM pharmacy WHERE emailAddress = :emailAddress";
+			$pharmacy_result = $dbHandler->selectQuery($sql_query, 
+				["emailAddress" => $emailAddress]);
 			$dbHandler->disconnect();
 			
 			if (!$pharmacy_result[0])
@@ -190,6 +192,7 @@ function handleLoginFormSubmission()
 				$_SESSION['pharmacyId'] = $pharmacy['pharmacyId'];
 				$_SESSION['title'] = $pharmacy['title'];
 				$_SESSION['emailAddress'] = $pharmacy['emailAddress'];
+				$_SESSION['role'] = 'pharmacy';
 
 				// alert message
 				header("Location: ../profiles/pharmacy_profile.php" .
@@ -198,10 +201,42 @@ function handleLoginFormSubmission()
 			}
 			break;
 
+		case "Supervisor":
+			$sql_query = "SELECT * FROM supervisor WHERE emailAddress = :emailAddress";
+			$supervisor_result = $dbHandler->selectQuery($sql_query, 
+				["emailAddress" => $emailAddress]);
+			$dbHandler->disconnect();
+			
+			if (!$supervisor_result[0])
+			{
+				header("Location: login.php?error=1");
+				exit;
+			}
+
+			$supervisor = $supervisor_result[0];
+			if (password_verify($password, $supervisor['passwordHash']))
+			{
+				start_session();
+				
+				$_SESSION['supervisorId'] = $supervisor['supervisorId'];
+				$_SESSION['firstName'] = $supervisor['firstName'];
+				$_SESSION['middleName'] = $supervisor['middleName'];
+				$_SESSION['lastName'] = $supervisor['lastName'];
+				$_SESSION['emailAddress'] = $supervisor['emailAddress'];
+				$_SESSION['role'] = 'supervisor';
+
+				// alert message
+				header("Location: ../profiles/supervisor_profile.php" .
+					"?supervisorId=" . $_SESSION['supervisorId']);
+				exit;
+			}
+			break;
+
 		case "Pharmaceutical":
 			$sql_query = "SELECT * FROM pharmaceutical WHERE emailAddress = " .
-				$emailAddress;
-			$pharmaceutical_result = $dbHandler->selectQuery($sql_query);
+				":emailAddress";
+			$pharmaceutical_result = $dbHandler->selectQuery($sql_query, 
+				["emailAddress" => $emailAddress]);
 			$dbHandler->disconnect();
 			
 			if (!$pharmaceutical_result[0])
@@ -218,6 +253,7 @@ function handleLoginFormSubmission()
 				$_SESSION['pharmaceuticalId'] = $pharmaceutical['pharmaceuticalId'];
 				$_SESSION['title'] = $pharmaceutical['title'];
 				$_SESSION['emailAddress'] = $pharmaceutical['emailAddress'];
+				$_SESSION['role'] = 'pharmaceutical';
 
 				// alert message
 				header("Location: ../profiles/pharmaceutical_profile.php" .

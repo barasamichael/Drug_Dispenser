@@ -28,10 +28,29 @@ function handlePrescriptionAssignmentFormSubmission($patientPractitionerId)
 			"patientPractitionerId" => $patientPractitionerId,
 			"frequency" => $_POST['frequency'],
 			"quantity" => $_POST['quantity'],
-			"supplyItemId" => $_POST['supplyItemId'],
+			"supplyItemId" => $_POST['supplyItemId']
 		]);
 		print_r($prescription);
 		$prescription->save();
+	}
+}
+
+function renderContractSupervisorAssignmentForm()
+{
+	$form = new ContractSupervisorAssignmentForm();
+	echo $form->render();
+}
+
+function handleContractSupervisorAssignmentFormSubmission()
+{
+	if ($_SERVER['REQUEST_METHOD'] === 'POST')
+	{
+		sanitizeForm();
+		$contractSupervisor = new ContractSupervisor([
+			"contractId" => $_POST['contractId'],
+			"supervisorId" => $_SESSION['supervisorId']
+		]);
+		$contractSupervisor->save();
 	}
 }
 

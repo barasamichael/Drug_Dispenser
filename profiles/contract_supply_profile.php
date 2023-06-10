@@ -1,6 +1,8 @@
 <?php
-
 require_once('../connect.php');
+
+session_start();
+$contractSupplyId = $_GET['contractSupplyId'];
 
 // database credentials
 $dsn = 'mysql:host=localhost; dbname=drugs_db';
@@ -17,11 +19,11 @@ $supply_query = "SELECT cs.contractSupplyId, cs.paymentComplete, cs.dateCreated,
 	"pharmaceutical_title FROM contract_supply as cs RIGHT OUTER JOIN " . 
 	"contract as c USING (contractId) RIGHT OUTER JOIN pharmaceutical " .
 	"USING (pharmaceuticalId) RIGHT OUTER JOIN pharmacy USING (pharmacyId) " .
-	"WHERE cs.contractSupplyId = 3";
+	"WHERE cs.contractSupplyId = $contractSupplyId";
 
 $supply_items_query = "SELECT si.supplyItemId, si.tradename, si.dateCreated, si.sellingPrice, " .
 	"si.costPrice, si.quantity, drug.scientificName FROM supply_item as si RIGHT OUTER JOIN " .
-	"drug USING (drugId) WHERE si.contractSupplyId = 3";
+	"drug USING (drugId) WHERE si.contractSupplyId = $contractSupplyId";
 
 $supply = $databaseHandler->selectQuery($supply_query);
 $supply_items = $databaseHandler->selectQuery($supply_items_query);

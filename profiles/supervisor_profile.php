@@ -1,12 +1,65 @@
 <?php
-
+/* ********************************************************************************************** *
+ *
+ * HEADING: supervisor_profile.php: Renders HTML required to display all details for specic 
+ *          Supervisor Profile ID        
+ * AUTHOR : Barasa Michael Murunga
+ * EMAIL  : michael.barasa@strathmore.edu
+ * NOTES  : User Sessions: The program utilizes session management as its core functionality, 
+ *          allowing for seamless interaction throughout the application.
+ *
+ *          Efficient Data Retrieval: The program efficiently retrieves essential data from the 
+ *          database and dynamically populates the relevant HTML elements. This ensures up-to-date 
+ *          information is displayed to users, enhancing the overall user experience.
+ *
+ *          Access Control: The program incorporates robust access control measures, restricting 
+ *          access to authorized individuals such as administrators, supervisors, pharmacists, and 
+ *          pharmaceutical personnel. 
+ *          Furthermore, it employs granular access controls to limit specific sections of the 
+ *          application, bolstering accountability and security.
+ *
+ *          Enhanced User Interface: The program leverages the power of CSS3 and JavaScript to 
+ *          enhance the visual appearance and interactivity of the application. This results in a 
+ *          polished and modern user interface that offers a seamless and engaging user experience.
+ *
+ * ********************************************************************************************** */
+require_once('../config.php');
 require_once("forms.php");
 require_once("views.php");
 require_once('../connect.php');
 
 session_start();
+/* ---------------------------------------------------------------------------------------------- *
+ *            ALLOW ACCESS TO ADMINISTRATOR, SUPERVISOR, PHARMACY AND PHARMACEUTICAL              *
+ * ---------------------------------------------------------------------------------------------- */
+if ($_SESSION['role'] == 'patient' || $_SESSION['role'] == 'practitioner')
+{
+	http_response_code(403);
+	header("Location: ../templates/errors/403.php");
+	exit;
+}
+/* ---------------------------------------------------------------------------------------------- *
+ *                             ENSURE ALL LINK PARAMETERS PROVIDED                                *
+ * ---------------------------------------------------------------------------------------------- */
+if (!$_GET['supervisorId'])
+{
+	header("Location: ../templates/errors/invalid_access.php");
+	exit;
+}
 $supervisorId = $_GET['supervisorId'];
 
+/* ---------------------------------------------------------------------------------------------- *
+ *                                  PREVENT CROSS PROFILE VIEWS                                   *
+ * ---------------------------------------------------------------------------------------------- */
+if ($_SESSION['role'] == 'supervisor' && $supervisorId != $_SESSION['supervisorId'])
+{
+	http_response_code(403);
+	header("Location: ../templates/errors/403.php");
+	exit;
+}
+/* ---------------------------------------------------------------------------------------------- *
+ *                                      HANDLE ALL POST REQUESTS                                  *
+ * ---------------------------------------------------------------------------------------------- */
 if ($_SERVER["REQUEST_METHOD"] === "POST")
 {
 	handleContractSupervisorAssignmentFormSubmission();
@@ -14,12 +67,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST")
 	exit;
 }
 
-// database credentials
-$dsn = 'mysql:host=localhost; dbname=drugs_db';
-$username = 'root';
-$password = 'MySQLXXX-123a8910';
-
-// Retrieve supervisor details and associated from database
+/* ---------------------------------------------------------------------------------------------- *
+ *                            RETRIEVE RELEVANT RECORDS FROM DATABASE                             *
+ * ---------------------------------------------------------------------------------------------- */
 $databaseHandler = new DatabaseHandler($dsn, $username, $password);
 $databaseHandler->connect();
 
@@ -34,10 +84,14 @@ $databaseHandler->disconnect();
 // Retrieve record of supervisor from results
 $supervisor = $supervisor[0];
 
-// set page title
+/* ---------------------------------------------------------------------------------------------- *
+ *                                      SET PAGE TITLE                                            *
+ * ---------------------------------------------------------------------------------------------- */
 $title = $supervisor['firstName'] . " " . $supervisor['middleName'] . " " . $supervisor['lastName'];
 
-// set contract supervisor assignment form
+/* ---------------------------------------------------------------------------------------------- *
+ *                            CONTRACT SUPERVISOR ASSIGNMENT FORM                                 *
+ * ---------------------------------------------------------------------------------------------- */
 ob_start();
 renderContractSupervisorAssignmentForm();
 $form = ob_get_clean();
@@ -47,6 +101,9 @@ $contract_assignment = <<<_HTML
 	$form
 	_HTML;
 
+/* ---------------------------------------------------------------------------------------------- *
+ *                 RECORDS OF ALL PATIENTS ASSIGNED TO FOR CURRENT PRACTITIONER                   *
+ * ---------------------------------------------------------------------------------------------- */
 $unique_id = 1;
 $contracts_table_data = null;
 foreach ($contracts as $contract)
@@ -121,91 +178,18 @@ $contracts_table = <<<_HTML
 $main_area = $contract_assignment;
 $main_area .= $contracts_table;
 
+/* ---------------------------------------------------------------------------------------------- *
+ *                          ACTUAL HTML CONTENT TO BE SENT TO BASE.PHP                            *
+ * ---------------------------------------------------------------------------------------------- */
 $content = <<<_HTML
+	<!---------------------------------- CSS STYLESHEETS -------------------------------------->
 	<link href = "../bootstrap.min.css" rel = "stylesheet">
-	<style>
-	.personal-info {
-	text-align: center;
-	}
-
-	.personal-info p {
-	font-family: 'Calibri light';
-	font-size: 20px;
-	}
-
-	.personal-info-header {
-	padding:3% 0;
-	margin: 4% 0;
-	}
-
-	.detail {
-	justify: right;
-	}
-
-	.card {
-	border: none;
-	margin: 20px 0;
-	border-radius: 10px;
-	box-shadow: 0 5px 7px rgba(0, 0, 0, 0.2);
-	}
-
-	.card-header {
-	background-color: purple;
-	color: #fff;
-	padding: 10px;
-	border-top-left-radius: 10px;
-	border-top-right-radius: 10px;
-	}
-
-	.card-body {
-	padding: 15px;
-	}
-
-	.card-title {
-	margin-bottom: 10px;
-	font-weight: bold;
-	font-size: 18px;
-	}
-
-	.card-text {
-	margin-bottom: 5px;
-	}
-
-	.fa-icon {
-	margin-right: 5px;
-	}
-
-	.card-item {
-	display: flex;
-	align-items: center;
-	margin-bottom: 10px;
-	color: purple;
-	color: #000;
-	}
-
-	.card-item i {
-	margin-right: 10px;
-	color: purple;
-	}
-
-	.item-name {
-	color: purple;
-	font-weight: bold;
-	}
-
-	.item-value {
-	margin-left: auto;
-	}
-	
-	.img {
-	display: block;
-	margin-left: auto;
-	margin-right: auto;
-	}
-	</style>
+	<link href = "static/css/supervisor_profile.css" rel = "stylesheet">
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+	<!--------------------------------------- MOMENT.JS---------------------------------------->
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js">
 	</script>
+	<!---------------------------- UPPER SIDEBAR PROFILE DETAILS ------------------------------>
 	<div class = "row">
 	<div class = "col-md-4 col-lg-3">
 	<img class = "img img-fluid rounded-circle mb-3" src = "../static/male-avatar.png">
@@ -220,7 +204,7 @@ $content = <<<_HTML
 	<a class = "btn btn-primary" href = "#">Edit Profile</a>
 	</div>
 
-	<!-- comprehensive information -->
+	<!------------------------------ LOWER SIDEBAR PROFILE DETAILS ---------------------------->
 	<div class="card">
 	<div class="card-header" style = "padding-left:50px;">
 	<h4>Personal Details</h4>
@@ -254,10 +238,12 @@ $content = <<<_HTML
 	</div>
 	</div>
 	</div>
+	<!-------------------------------------- MAIN AREA ---------------------------------------->
 	<div class = "col-md-8 col-lg-9" style = "padding:3%;">
 	$main_area
 	</div>
 	</div>
+	<!---------------------------------- JAVASCRIPT AND JQUERY -------------------------------->
 	<script>
 		// format last seen
 		var lastUpdated = document.getElementById("lastUpdated");

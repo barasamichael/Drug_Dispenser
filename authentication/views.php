@@ -261,6 +261,13 @@ function handleLoginFormSubmission()
 				exit;
 			}
 			break;
+		
+		case "Administrator":
+			start_session();
+			$_SESSION['role'] = 'administrator';
+			header("Location: ../profiles/pharmaceutical_profile.php" .
+				"?pharmaceuticalId=2");
+			exit;
 
 		default:
 			return false;

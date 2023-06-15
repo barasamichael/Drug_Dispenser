@@ -1,21 +1,39 @@
 <?php
 require_once("../connect.php");
 require_once("../config.php");
-echo "<link rel = 'stylesheet' href = '../bootstrap.min.css'>";
 
-// Retrieve patient details from database
+session_start();
+
+/* ---------------------------------------------------------------------------------------------- *
+ *                                      ALLOW ADMINISTRATOR ACCESS                                *
+ * ---------------------------------------------------------------------------------------------- */
+if ($_SESSION['role'] != 'administrator')
+{
+	http_response_code(403);
+	header("Location: ../templates/errors/403.php");
+	exit;
+}
+
+/* ---------------------------------------------------------------------------------------------- *
+ *                            RETRIEVE SPECIALTY RECORDS FROM DATABASE                            *
+ * ---------------------------------------------------------------------------------------------- */
 $dbHandler = new DatabaseHandler($dsn, $username, $password);
 $dbHandler->connect();
 $result = $dbHandler->selectQuery('SELECT * FROM specialty');
 $dbHandler->disconnect();
 
-// display heading of page
+/* ---------------------------------------------------------------------------------------------- *
+ *                                       DISPLAY HEADING OF PAGE                                  *
+ * ---------------------------------------------------------------------------------------------- */
 $content = <<<_HTML
 	<div>
+	<link rel = 'stylesheet' href = '../bootstrap.min.css'>
 	<h3 style = "color = green;" class = "page-header">List Of Specialties</h3>
 	_HTML;
 
-// display specialties in table
+/* ---------------------------------------------------------------------------------------------- *
+ *                                    DISPLAY SPECIALTIES IN TABLE                                *
+ * ---------------------------------------------------------------------------------------------- */
 $content .= <<<_HTML
 	<table class = 'table table-striped table-responsive table-hover'>
 	<thead>
@@ -27,7 +45,6 @@ $content .= <<<_HTML
 	<body>
 	_HTML;
 
-// populate table rows with data
 foreach ($result as $row)
 {
 	$content .= <<<_HTML
@@ -38,14 +55,15 @@ foreach ($result as $row)
 		_HTML;
 }
 
-// complete creation of table
 $content .= <<<_HTML
 	</body>
 	</table>
 	</div>
 	_HTML;
 
-// Provide title of page (used in base template)
+/* ---------------------------------------------------------------------------------------------- *
+ *                                       DISPLAY HEADING OF PAGE                                  *
+ * ---------------------------------------------------------------------------------------------- */
 $title = "List of Specialties";
 
 require_once('../templates/base.php');

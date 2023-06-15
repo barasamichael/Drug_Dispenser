@@ -1,12 +1,127 @@
 <?php
-
+/* ********************************************************************************************** *
+ *
+ * HEADING: patient_profile.php: Renders HTML required to display all details for specic 
+ *          Patient Profile ID        
+ * AUTHOR : Barasa Michael Murunga
+ * EMAIL  : michael.barasa@strathmore.edu
+ * NOTES  : User Sessions: The program utilizes session management as its core functionality, 
+ *          allowing for seamless interaction throughout the application.
+ *
+ *          Efficient Data Retrieval: The program efficiently retrieves essential data from the 
+ *          database and dynamically populates the relevant HTML elements. This ensures up-to-date 
+ *          information is displayed to users, enhancing the overall user experience.
+ *
+ *          Access Control: The program incorporates robust access control measures, restricting 
+ *          access to authorized individuals such as administrators, pharmacists, patients, and 
+ *          practitioners. Only practitioners assigned to the patient can access their details. 
+ *          Furthermore, it employs granular access controls to limit specific sections of the 
+ *          application, bolstering accountability and security.
+ *
+ *          Enhanced User Interface: The program leverages the power of CSS3 and JavaScript to 
+ *          enhance the visual appearance and interactivity of the application. This results in a 
+ *          polished and modern user interface that offers a seamless and engaging user experience.
+ *
+ *          USER PERMISSIONS
+ *          1. Patient
+ *          	- View and Modify Profile Details
+ *          	- View, Modify and Disable Practitioner Assignments
+ *          2. Practitioner
+ *          	- View Profile Details
+ *          	- View, Assign and Revoke Prescriptions
+ *          3. Administrator
+ *          	- View and Modify Profile Details
+ *          	- View, Modify and Disable Practitioner Assignments
+ *          	- View and Revoke Prescriptions
+ *          4. Pharmacy
+ *          	- View Profile Details
+ *          	- View Assigned Prescriptions
+ *          	- Confirm Completed Prescription Assignment
+ *
+ * ********************************************************************************************** */
 require_once("forms.php");
 require_once("views.php");
 require_once('../connect.php');
+require_once('../config.php');
 
 session_start();
+
+/* ---------------------------------------------------------------------------------------------- *
+ *             ALLOW ADMINISTRATOR, PHARMACY, PRACTITIONER AND PATIENT ACCESS                     *
+ * ---------------------------------------------------------------------------------------------- */
+if ($_SESSION['role'] == 'pharmaceutical' || $_SESSION['role'] == 'supervisor')
+{
+	http_response_code(403);
+	header("Location: ../templates/errors/403.php");
+	exit;
+}
+
+/* ---------------------------------------------------------------------------------------------- *
+ *                             ENSURE ALL LINK PARAMETERS PROVIDED                                *
+ * ---------------------------------------------------------------------------------------------- */
+if (!$_GET['patientId'])
+{
+	header("Location: ../templates/errors/invalid_access.php");
+	exit;
+}
 $patientId = $_GET['patientId'];
 
+/* ---------------------------------------------------------------------------------------------- *
+ *                                  PREVENT CROSS PROFILE VIEWS                                   *
+ * ---------------------------------------------------------------------------------------------- */
+$databaseHandler = new DatabaseHandler($dsn, $username, $password);
+$databaseHandler->connect();
+
+if ($_SESSION['role'] == 'patient' && $patientId != $_SESSION['patientId'])
+{
+	http_response_code(403);
+	header("Location: ../templates/errors/403.php");
+	exit;
+}
+else if ($_SESSION['role'] == 'pharmacy')
+{
+	$query = "SELECT pharmacy.pharmacyId, patient.patientId FROM prescription RIGHT OUTER " .
+		"JOIN supply_item as si USING (supplyItemId) RIGHT OUTER JOIN contract_supply " .
+		"USING (contractSupplyId) RIGHT OUTER JOIN contract USING (contractId) RIGHT " .
+		"OUTER JOIN pharmacy USING (pharmacyId) RIGHT OUTER JOIN patient_practitioner " .
+		"USING (patientPractitionerId) RIGHT OUTER JOIN patient USING " .
+		"(patientId) WHERE patient.patientId = :patientId AND pharmacy.pharmacyId = " .
+		":pharmacyId ORDER BY prescription.dateCreated DESC LIMIT 1";
+
+	$result = $databaseHandler->selectQuery($query, ["patientId" => $patientId, 
+		"pharmacyId" => $_SESSION['pharmacyId']]);
+	if(!$result[0])
+	{
+		/* This pharmacy has no prescriptions with its drugs assigned to them */
+		http_response_code(403);
+		header("Location: ../templates/errors/403.php");
+		exit;
+	}
+}
+else if ($_SESSION['role'] == 'practitioner')
+{
+	$query = "SELECT patientPractitionerId FROM patient_practitioner WHERE patientId" .
+		" = :patientId AND practitionerId = :practitionerId ORDER BY dateCreated" .
+		" LIMIT 1";	
+	$result = $databaseHandler->selectQuery($query, ["patientId" => $patientId, 
+		"practitionerId" => $_SESSION['practitionerId']]);
+	try
+	{
+		$patientPractitonerId = $result[0]['patientPractitionerId'];
+	}
+	catch (Exception $e)
+	{
+		/* practitioner wants to access records of a patient they are not assigned to */
+		http_response_code(403);
+		header("Location: ../templates/errors/403.php");
+		exit;
+	}
+}
+$databaseHandler->disconnect();
+
+/* ---------------------------------------------------------------------------------------------- *
+ *                                      HANDLE ALL POST REQUESTS                                  *
+ * ---------------------------------------------------------------------------------------------- */
 if ($_SERVER["REQUEST_METHOD"] === "POST")
 {
 	if (isset($_POST['practitionerId']))
@@ -15,37 +130,21 @@ if ($_SERVER["REQUEST_METHOD"] === "POST")
 		header("Location: patient_profile.php?patientId=$patientId");
 		exit;
 	}
-	else if (isset($_POST['supplyItemId']))
+	else if (isset($_POST['supplyItemId']) && $_SESSION['role'] == 'practitioner')
 	{
-		// database credentials
-		$dsn = 'mysql:host=localhost; dbname=drugs_db';
-		$username = 'root';
-		$password = 'MySQLXXX-123a8910';
-
-		// extract current patient_practitioner item Id
-		$databaseHandler = new DatabaseHandler($dsn, $username, $password);
-		$query = "SELECT patientPractitionerId FROM patient_practitioner WHERE patientId = :patientId " .
-			"AND practitionerId = :practitionerId ORDER BY dateCreated LIMIT 1";	
-		$result = $databaseHandler->executeQuery($query, ["patientId" => $patientId, 
-			"practitionerId" => $_SESSION['practitionerId']]);
-		$databaseHandler->disconnect();
-
-		// handler prescription assignment form submission
-		handlePrescriptionAssignmentFormSubmission($result[0]['patientPractitionerId']);
-		
-		// refresh page
+		/* 
+		 * If the practitioner contraint passes here, that means that the practioner was 
+		 * extracted before successfully and we have a valid $patientPractitionerId variable
+		 */
+		handlePrescriptionAssignmentFormSubmission($patientPractitionerId);
 		header("Location: patient_profile.php?patientId=$patientId");
 		exit;
 	}
 }
 
-// database credentials
-$dsn = 'mysql:host=localhost; dbname=drugs_db';
-$username = 'root';
-$password = 'MySQLXXX-123a8910';
-
-// Retrieve patient details and associated from database
-$databaseHandler = new DatabaseHandler($dsn, $username, $password);
+/* ---------------------------------------------------------------------------------------------- *
+ *                            RETRIEVE RELEVANT RECORDS FROM DATABASE                             *
+ * ---------------------------------------------------------------------------------------------- */
 $databaseHandler->connect();
 
 $patient_query = "SELECT * FROM patient WHERE patientId = $patientId";
@@ -72,10 +171,14 @@ $databaseHandler->disconnect();
 // Retrieve record of patient from results
 $patient = $patient[0];
 
-// set page title
+/* ---------------------------------------------------------------------------------------------- *
+ *                                      SET PAGE TITLE                                            *
+ * ---------------------------------------------------------------------------------------------- */
 $title = $patient['firstName'] . " " . $patient['middleName'] . " " . $patient['lastName'];
 
-// Patient Practitioner Assignment Form
+/* ---------------------------------------------------------------------------------------------- *
+ *                           PATIENT PRACTITIONER ASSIGNMENT FORM                                 *
+ * ---------------------------------------------------------------------------------------------- */
 ob_start();
 renderPatientPractitionerAssignmentForm();
 $form = ob_get_clean();
@@ -85,7 +188,9 @@ $practitioner_assignment = <<<_HTML
 	$form
 	_HTML;
 
-// Prescription Assignment Form
+/* ---------------------------------------------------------------------------------------------- *
+ *                                  PRESCRIPTION ASSIGNMENT FORM                                  *
+ * ---------------------------------------------------------------------------------------------- */
 ob_start();
 renderPrescriptionAssignmentForm();
 $form = ob_get_clean();
@@ -96,6 +201,9 @@ $prescription_assignment = <<<_HTML
 	$form
 	_HTML;
 
+/* ---------------------------------------------------------------------------------------------- *
+ *                  RECORDS OF ALL SUPPLY ITEMS FOR CURRENT SUPPLY INSTANCE                       *
+ * ---------------------------------------------------------------------------------------------- */
 $practitioners_table_data = null;
 foreach ($practitioners as $practitioner)
 {
@@ -132,6 +240,9 @@ foreach ($practitioners as $practitioner)
 		_HTML;
 }
 
+/* ---------------------------------------------------------------------------------------------- *
+ *                  RECORDS OF ALL SUPPLY ITEMS FOR CURRENT SUPPLY INSTANCE                       *
+ * ---------------------------------------------------------------------------------------------- */
 $prescriptions_table_data = null;
 $unique_id = 1;
 foreach ($prescriptions as $prescription)
@@ -139,8 +250,13 @@ foreach ($prescriptions as $prescription)
 	$prescriptions_table_data .= <<<_HTML
 		<tr>
 		<td>{$prescription['prescriptionId']}</td>
-		<td>{$prescription['firstName']} 
-		{$prescription['middleName']} {$prescription['lastName']}</td>
+		<td>
+		<a href = "practitioner_profile.php?practitionerId={$prescription['practitionerId']}">
+		{$prescription['firstName']} 
+		{$prescription['middleName']} 
+		{$prescription['lastName']}
+		</a>
+		</td>
 		<td>{$prescription['tradename']}</td>
 		<td>{$prescription['quantity']}</td>
 		<td>{$prescription['frequency']}</td>
@@ -191,6 +307,26 @@ foreach ($prescriptions as $prescription)
 	$unique_id += 1;
 }
 
+/* ***********************************************************************************************
+ *    THIS CODE REMEDIES A BUG IN THE QUERY THAT EXTRACTS ALL PRESCRIPTIONS ASSIGNED TO PATIENT
+ *                   When there are no prescriptions, this array is returned
+ * 	Array ( 
+ * 		[0] => Array ( 
+ * 			[prescriptionId] => [0] => [practitionerId] => [1] => [firstName] => [2] => 
+ * 			[middleName] => [3] => [lastName] => [4] => [frequency] => [5] => 
+ * 			[quantity] => [6] => [assigned] => [7] => [dateCreated] => [8] => 
+ * 			[lastUpdated] => [9] => [tradename] => [10] => [supplyItemId] => [11] => 
+ * 		) 
+ * 	)
+ * ***********************************************************************************************/
+if (count($prescriptions) == 1 && $prescriptions[0]['prescriptionId'] == 0)
+{
+	$prescriptions_table_data = null;
+}
+
+/* ---------------------------------------------------------------------------------------------- *
+ *                                    RECORD TABLE HEADERS                                        *
+ * ---------------------------------------------------------------------------------------------- */
 $practitioners_table = <<<_HTML
 	<h3 class = "text-muted">Assigned Practitioners</h3>
 	<div class = "list-group">
@@ -238,93 +374,36 @@ $prescription_table = <<<_HTML
 	</div>
 	_HTML;
 
-$main_area = $practitioners_table;
-$main_area .= $practitioner_assignment;
-$main_area .= $prescription_table;
-$main_area .= $prescription_assignment; 
-
-$content = <<<_HTML
-	<style>
-	.personal-info {
-	text-align: center;
-	}
-
-	.personal-info p {
-	font-family: 'Calibri light';
-	font-size: 20px;
-	}
-
-	.personal-info-header {
-	padding:3% 0;
-	margin: 4% 0;
-	}
-
-	.detail {
-	justify: right;
-	}
+/* ---------------------------------------------------------------------------------------------- *
+ *                  FILTER CONTENT VIEWED BY USER BASED ON CURRENT USER ROLE                      *
+ * ---------------------------------------------------------------------------------------------- */
+$main_area = null;
+if ($_SESSION['role'] == 'patient' || $_SESSION['role'] == 'administrator')
+{
+	$main_area .= $practitioners_table;
+	$main_area .= $practitioner_assignment;
 	
-	.card {
-	border: none;
-	margin: 20px 0;
-	border-radius: 10px;
-	box-shadow: 0 5px 7px rgba(0, 0, 0, 0.2);
-	}
+}
 
-	.card-header {
-	background-color: brown;
-	color: #fff;
-	padding: 10px;
-	border-top-left-radius: 10px;
-	border-top-right-radius: 10px;
-	}
+if ($_SESSION['role'] == 'practitioner' || $_SESSION['role'] == 'pharmacy' 
+	|| $_SESSION['role'] == 'patient' || $_SESSION['role'] == 'administrator')
+{
+	$main_area .= $prescription_table;
+}
 
-	.card-body {
-	padding: 15px;
-	}
+if ($_SESSION['role'] == 'practitioner' || $_SESSION['role'] == 'administrator')
+{
+	$main_area .= $prescription_assignment;
+}
 
-	.card-title {
-	margin-bottom: 10px;
-	font-weight: bold;
-	font-size: 18px;
-	}
-
-	.card-text {
-	margin-bottom: 5px;
-	}
-
-	.fa-icon {
-	margin-right: 5px;
-	}
-
-	.card-item {
-	display: flex;
-	align-items: center;
-	margin-bottom: 10px;
-	color: brown;
-	color: #000;
-	}
-
-	.card-item i {
-	margin-right: 10px;
-	color: brown;
-	}
-
-	.item-name {
-	color: brown;
-	font-weight: bold;
-	}
-
-	.item-value {
-	margin-left: auto;
-	}
-
-	.img {
-	display: block;
-	margin-left: auto;
-	margin-right: auto;
-	}
-	</style>
+/* ---------------------------------------------------------------------------------------------- *
+ *                          ACTUAL HTML CONTENT TO BE SENT TO BASE.PHP                            *
+ * ---------------------------------------------------------------------------------------------- */
+$content = <<<_HTML
+	<!---------------------------------- CSS STYLESHEETS -------------------------------------->
 	<link href = "../bootstrap.min.css" rel = "stylesheet">
+	<link href = "static/css/patient_profile.css" rel = "stylesheet">
+	<!---------------------------- UPPER SIDEBAR PATIENT DETAILS ------------------------------>
 	<div class = "row">
 	<div class = "col-md-4 col-lg-3">
 	<img class = "img img-fluid rounded-circle mb-3" src = "../static/male-avatar.png">
@@ -342,6 +421,7 @@ $content = <<<_HTML
 	</p>
 	<a class = "btn btn-primary" href = "#">Edit Profile</a>
 	</div>
+	<!---------------------------- LOWER SIDEBAR PATIENT DETAILS ------------------------------>
 	<div class="card" style = "margin-top: 20%;">
 	<div class="card-header" style = "padding-left:50px;">
 	<h4>Personal Details</h4>
@@ -393,10 +473,12 @@ $content = <<<_HTML
 	</div>
 	</div>
 	</div>
+	<!--------------------------------------- MAIN AREA --------------------------------------->
 	<div class = "col-md-8 col-lg-9" style = "padding:3%;">
 	$main_area
 	</div>
 	</div>
+	<!---------------------------------- JAVASCRIPT AND JQUERY -------------------------------->
 	<script>
 		// format last seen
 		var lastSeen = document.getElementById("lastSeen");

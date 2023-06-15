@@ -27,7 +27,8 @@ class LoginForm extends CustomForm
 				"Practitioner" => "Practitioner",
 				"Supervisor" => "Supervisor",
 				"Pharmacy" => "Pharmacy",
-				"Pharmaceutical" => "Pharmaceutical"
+				"Pharmaceutical" => "Pharmaceutical",
+				"Administrator" => "Administrator"
 			]
 		]);
 	

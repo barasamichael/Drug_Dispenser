@@ -125,7 +125,7 @@
 				<a href="">MediHelp PLC</a>
 			</div>
 			<ul class="nav-links">
-				<li><a href="">Home</a></li>
+				<li><a href="../templates/main/homepage.php">Home</a></li>
 				<li><a href="">About Us</a></li>
 				<li><a href="">Blog</a></li>
 				<li><a href="">Contact Us</a></li>
@@ -145,7 +145,6 @@
 				?>
 			</div>
 		</nav>
-		<hr>
 		<div class = "container">
 			<?php echo $content; ?>
 		</div>

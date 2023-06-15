@@ -1,15 +1,63 @@
 <?php
+/* ********************************************************************************************** *
+ *
+ * HEADING: pharmacy_profile.php: Renders HTML required to display all details for specic 
+ *          Pharmacy Profile ID        
+ * AUTHOR : Barasa Michael Murunga
+ * EMAIL  : michael.barasa@strathmore.edu
+ * NOTES  : User Sessions: The program utilizes session management as its core functionality, 
+ *          allowing for seamless interaction throughout the application.
+ *
+ *          Efficient Data Retrieval: The program efficiently retrieves essential data from the 
+ *          database and dynamically populates the relevant HTML elements. This ensures up-to-date 
+ *          information is displayed to users, enhancing the overall user experience.
+ *
+ *          Access Control: The program incorporates robust access control measures, restricting 
+ *          access to authorized individuals such as administrators, supervisors, pharmacists, and 
+ *          pharmaceutical personnel. 
+ *          Furthermore, it employs granular access controls to limit specific sections of the 
+ *          application, bolstering accountability and security.
+ *
+ *          Enhanced User Interface: The program leverages the power of CSS3 and JavaScript to 
+ *          enhance the visual appearance and interactivity of the application. This results in a 
+ *          polished and modern user interface that offers a seamless and engaging user experience.
+ *
+ * ********************************************************************************************** */
 require_once('../connect.php');
+require_once('../config.php');
 
 session_start();
+/* ---------------------------------------------------------------------------------------------- *
+ *            ALLOW ACCESS TO ADMINISTRATOR, SUPERVISOR, PHARMACY AND PHARMACEUTICAL              *
+ * ---------------------------------------------------------------------------------------------- */
+if ($_SESSION['role'] == 'patient' || $_SESSION['role'] == 'practitioner')
+{
+	http_response_code(403);
+	header("Location: ../templates/errors/403.php");
+	exit;
+}
+/* ---------------------------------------------------------------------------------------------- *
+ *                             ENSURE ALL LINK PARAMETERS PROVIDED                                *
+ * ---------------------------------------------------------------------------------------------- */
+if (!$_GET['pharmacyId'])
+{
+	header("Location: ../templates/errors/invalid_access.php");
+	exit;
+}
 $pharmacyId = $_GET['pharmacyId'];
 
-// database credentials
-$dsn = 'mysql:host=localhost; dbname=drugs_db';
-$username = 'root';
-$password = 'MySQLXXX-123a8910';
-
-// Retrieve pharmacy details and associated from database
+/* ---------------------------------------------------------------------------------------------- *
+ *                                  PREVENT CROSS PROFILE VIEWS                                   *
+ * ---------------------------------------------------------------------------------------------- */
+if ($_SESSION['role'] == 'pharmacy' && $pharmacyId != $_SESSION['pharmacyId'])
+{
+	http_response_code(403);
+	header("Location: ../templates/errors/403.php");
+	exit;
+}
+/* ---------------------------------------------------------------------------------------------- *
+ *                            RETRIEVE RELEVANT RECORDS FROM DATABASE                             *
+ * ---------------------------------------------------------------------------------------------- */
 $databaseHandler = new DatabaseHandler($dsn, $username, $password);
 $databaseHandler->connect();
 $pharmacy_query = "SELECT * FROM pharmacy WHERE pharmacyId = $pharmacyId";
@@ -26,9 +74,14 @@ $databaseHandler->disconnect();
 // Retrieve record of pharmacy from results
 $pharmacy = $pharmacy[0];
 
-// set page title
+/* ---------------------------------------------------------------------------------------------- *
+ *                                      SET PAGE TITLE                                            *
+ * ---------------------------------------------------------------------------------------------- */
 $title = $pharmacy['title'];
 
+/* ---------------------------------------------------------------------------------------------- *
+ *                              SET HEADER INFORMATION ON SIDEBAR                                 *
+ * ---------------------------------------------------------------------------------------------- */
 $company_image = <<<_HTML
 	<div class="image-container">
 	<div class="semi-circle"></div>
@@ -47,6 +100,9 @@ $company_image = <<<_HTML
 	</div>
 	_HTML;
 
+/* ---------------------------------------------------------------------------------------------- *
+ *                        SET PHARMACEUTICAL INFORMATION CARD ON MAIN AREA                        *
+ * ---------------------------------------------------------------------------------------------- */
 $locationAddress = urlencode($pharmacy['locationAddress']);
 $googleSearchUrl = "https://www.google.com/maps/search/?api=1&query={$locationAddress}";
 $company_information = <<<_HTML
@@ -97,38 +153,11 @@ $company_information = <<<_HTML
 	</div>
 	_HTML;
 
+/* ---------------------------------------------------------------------------------------------- *
+ *                                  RECORDS OF ASSIGNED CONTRACTS                                 *
+ * ---------------------------------------------------------------------------------------------- */
 $contracts_section = <<<_HTML
 	<style>
-	.page-header h3 {
-	margin-top: 7%;
-	color: #FF8000;
-	font-weight: bold;
-	}
-	.contract {
-		margin: 1% 0;
-	}
-
-	.contract-item {
-		padding: 0;
-	}
-
-	.contract-item img {
-		border-top-left-radius: 5px;
-		border-bottom-left-radius: 5px;
-	}
-
-	.explanation {
-		font-weight: bold;
-	}
-
-	.btn {
-	font-size: 17px;
-	}
-
-	.btn-pill {
-	border-radius: 50px;
-	padding: 10px 20px;
-	}
 	</style>
 	<div class = "page-header text-center">
 	<h3>List of Assigned Contracts</h3>
@@ -189,176 +218,34 @@ foreach ($contracts as $contract)
 	$unique_id += 1;
 }
 
+/* ---------------------------------------------------------------------------------------------- *
+ *                          ACTUAL HTML CONTENT TO BE SENT TO BASE.PHP                            *
+ * ---------------------------------------------------------------------------------------------- */
 $content = <<<_HTML
-	<style>
-	.card {
-	border: none;
-	margin: 20px 0;
-	border-radius: 10px;
-	box-shadow: 0 5px 7px rgba(0, 0, 0, 0.2);
-	}
-
-	.card-header {
-	background-color: brown;
-	color: #fff;
-	padding: 10px;
-	border-top-left-radius: 10px;
-	border-top-right-radius: 10px;
-	}
-
-	.card-body {
-	padding: 15px;
-	}
-
-	.card-title {
-	margin-bottom: 10px;
-	font-weight: bold;
-	font-size: 18px;
-	}
-
-	.card-text {
-	margin-bottom: 5px;
-	}
-
-	.fa-icon {
-	margin-right: 5px;
-	}
-
-	.card-item {
-	display: flex;
-	align-items: center;
-	margin-bottom: 10px;
-	color: brown;
-	color: #000;
-	font-size: 20px;
-	}
-
-	.card-item i {
-	margin-right: 10px;
-	color: brown;
-	}
-
-	.item-name {
-	color: brown;
-	font-weight: bold;
-	}
-
-	.item-value {
-	margin-left: auto;
-	}
-
-	.image-container {
-	position: relative;
-	display: inline-block;
-	border-radius: 10px;
-	overflow: hidden;
-	width: 100%;
-	margin-top:3%;
-	}
-
-	.image-container img {
-	display: block;
-	max-width: 100%;
-	width: 100%;
-	height: auto;
-	filter: brightness(80%);
-	}
-
-	.overlay {
-	position: absolute;
-	top: 50%;
-	left: 50%;
-	transform: translate(-50%, -50%);
-	text-align: center;
-	}
-
-	.semi-circle {
-	position: absolute;
-	top: 0;
-	left: 0;
-	width: 100%;
-	height: 100%;
-	background: radial-gradient(ellipse at bottom right, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.2) 100%);
-	transform: rotate(45deg);
-	z-index: 1;
-	}
-
-	.overlay-text {
-	color: #fff;
-	font-size: 24px;
-	font-weight: bold;
-	text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
-	opacity: 0;
-	white-space: nowrap;
-	overflow: hidden;
-	animation: text-animation 12s linear infinite;
-	}
-
-	.overlay-text h1 {
-	color : #fff;
-	}
-
-	.overlay-text:nth-child(1) {
-	animation-delay: 0s;
-	}
-
-	.overlay-text:nth-child(2) {
-	animation-delay: 4s;
-	}
-
-	.overlay-text:nth-child(3) {
-	animation-delay: 8s;
-	}
-
-	@keyframes text-animation {
-	0%, 5% {
-	opacity: 1;
-	width: 0;
-	}
-	20%, 25% {
-	width: 100%;
-	}
-	95%, 100% {
-	opacity: 0;
-	width: 100%;
-	}
-	}
-
-	.update-info {
-	padding-right: 20px;
-	padding-top: 1%;
-	}
-
-	.btn-update {
-	background-color: brown;
-	color: #fff;
-	}
-
-	.btn-profile-image{
-	width: 41%;
-	}
-
-	.btn-profile-info{
-	width: 55%;
-	float: right;
-	}
-	</style>
-		<link href = "../bootstrap.min.css" rel = "stylesheet">
-		<div class = "row">
-		<div class = "col-md-5 col-lg-5">
-		$company_image
-		</div>
-		<div class = "col-md-7 col-lg-7" style = "padding:3%;">
-		$company_information
-		</div>
-		</div>
-		<div class = "update-info">
-		<a href = "" class = "btn btn-update btn-profile-image">Update Profile Image</a>
-		<a href = "" class = "btn btn-update btn-profile-info">Update Profile Information</a>
-		</div>
-		<div>
-		$contracts_section
-		</div>
+	<!---------------------------------- CSS STYLESHEETS -------------------------------------->
+	<link href = "../bootstrap.min.css" rel = "stylesheet">
+	<link href = "static/css/pharmacy_profile.css" rel = "stylesheet">
+	<!--------------------------------- PHARMACEUTICAL DETAILS -------------------------------->
+	<div class = "row">
+	<div class = "col-md-5 col-lg-5">
+	$company_image
+	</div>
+	<div class = "col-md-7 col-lg-7" style = "padding:3%;">
+	$company_information
+	</div>
+	</div>
+	<div class = "update-info">
+	<a href = "" class = "btn btn-update btn-profile-image">Update Profile Image</a>
+	<a href = "" class = "btn btn-update btn-profile-info">Update Profile Information</a>
+	</div>
+	<div>
+	<a href = "list_of_prescriptions.php" class = "btn btn-primary btn-contract btn-large">View Assigned Prescriptions</a>
+	</div>
+	<!---------------------------------- ASSIGNED CONTRACTS ----------------------------------->
+	<div>
+	$contracts_section
+	</div>
+	<!---------------------------------- JAVASCRIPT AND JQUERY -------------------------------->
 	<script>
 		// is pharmaceutical active?
 		var active = document.getElementById("active");

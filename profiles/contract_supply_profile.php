@@ -1,15 +1,56 @@
 <?php
+/* ********************************************************************************************** *
+ *
+ * HEADING: contract_supply_profile.php: Renders HTML required to display all details for specic 
+ *          Supply Profile ID        
+ * AUTHOR : Barasa Michael Murunga
+ * EMAIL  : michael.barasa@strathmore.edu
+ * NOTES  : User Sessions: The program utilizes session management as its core functionality, 
+ *          allowing for seamless interaction throughout the application.
+ *
+ *          Efficient Data Retrieval: The program efficiently retrieves essential data from the 
+ *          database and dynamically populates the relevant HTML elements. This ensures up-to-date 
+ *          information is displayed to users, enhancing the overall user experience.
+ *
+ *          Access Control: The program incorporates robust access control measures, restricting 
+ *          access to authorized individuals such as administrators, supervisors, pharmacists, and 
+ *          pharmaceutical personnel. 
+ *          Furthermore, it employs granular access controls to limit specific sections of the 
+ *          application, bolstering accountability and security.
+ *
+ *          Enhanced User Interface: The program leverages the power of CSS3 and JavaScript to 
+ *          enhance the visual appearance and interactivity of the application. This results in a 
+ *          polished and modern user interface that offers a seamless and engaging user experience.
+ *
+ * ********************************************************************************************** */
 require_once('../connect.php');
-
+require_once('../config.php');
 session_start();
+
+/* ---------------------------------------------------------------------------------------------- *
+ *              ALLOW ADMINISTRATOR, PHARMACY, PHARMACEUTICAL AND SUPERVISOR ACCESS               *
+ * ---------------------------------------------------------------------------------------------- */
+if ($_SESSION['role'] == 'patient' || $_SESSION['role'] == 'practitioner')
+{
+	http_response_code(403);
+	header("Location: ../templates/errors/403.php");
+	exit;
+}
+
+
+/* ---------------------------------------------------------------------------------------------- *
+ *                             ENSURE ALL LINK PARAMETERS PROVIDED                                *
+ * ---------------------------------------------------------------------------------------------- */
+if (!$_GET['contractSupplyId'])
+{
+	header("Location: ../templates/errors/invalid_access.php");
+	exit;
+}
 $contractSupplyId = $_GET['contractSupplyId'];
 
-// database credentials
-$dsn = 'mysql:host=localhost; dbname=drugs_db';
-$username = 'root';
-$password = 'MySQLXXX-123a8910';
-
-// Retrieve supply details and associated from database
+/* ---------------------------------------------------------------------------------------------- *
+ *                            RETRIEVE RELEVANT RECORDS FROM DATABASE                             *
+ * ---------------------------------------------------------------------------------------------- */
 $databaseHandler = new DatabaseHandler($dsn, $username, $password);
 $databaseHandler->connect();
 
@@ -33,9 +74,14 @@ $databaseHandler->disconnect();
 // Retrieve record of supply from results
 $supply = $supply[0];
 
-// set page title
+/* ---------------------------------------------------------------------------------------------- *
+ *                                      SET PAGE TITLE                                            *
+ * ---------------------------------------------------------------------------------------------- */
 $title = "Supply Profile | Supply ID " . $supply['contractSupplyId'];
 
+/* ---------------------------------------------------------------------------------------------- *
+ *                  RECORDS OF ALL SUPPLY ITEMS FOR CURRENT SUPPLY INSTANCE                       *
+ * ---------------------------------------------------------------------------------------------- */
 $unique_id = 1;
 $supply_items_table_data = null;
 foreach ($supply_items as $item) {
@@ -49,7 +95,8 @@ foreach ($supply_items as $item) {
 		<td>{$item['costPrice']}</td>
 		<td>{$item['sellingPrice']}</td>
 		</tr>
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js">
+		</script>
 		<script>
 			var dateCreated = document.getElementById("dateCreated{$unique_id}");
 			dateCreated.innerText = moment(dateCreated.innerText).format(
@@ -59,71 +106,14 @@ foreach ($supply_items as $item) {
 	$unique_id += 1;
 }
 	
+/* ---------------------------------------------------------------------------------------------- *
+ *                          ACTUAL HTML CONTENT TO BE SENT TO BASE.PHP                            *
+ * ---------------------------------------------------------------------------------------------- */
 $content = <<<_HTML
+	<!---------------------------------- CSS STYLESHEETS -------------------------------------->
 	<link href = "../bootstrap.min.css" rel = "stylesheet">
-	<style>
-	.btn {
-	font-size: 17px;
-	}
-
-	.btn-pill {
-	border-radius: 50px;
-	padding: 10px 20px;
-	}
-
-	.list-group {
-	font-family: Calibri;
-	}
-
-	.explanation {
-		font-weight: bold;
-		color: brown;
-	}
-	ul.list-unstyled {
-	list-style-type: none;
-	padding: 0;
-	}
-
-	ul.list-unstyled li {
-	display: flex;
-	align-items: center;
-	margin-bottom: 10px;
-	}
-	
-	.explanation {
-	font-weight: bold;
-	margin-right: 10px;
-	min-width: 150px;
-	}
-
-	.new-supply {
-	}
-
-	.new-supply a {
-	width: 100%;
-	background-color: #FF8000;
-	border-color: #FF8000;
-	}
-
-	.new-supply a:hover {
-	background-color: #FF7000;
-	}
-	
-	.new-supply a {
-	width: 100%;
-	background-color: #FF8000;
-	border-color: #FF8000;
-	}
-
-	.new-supply a:hover {
-	background-color: #FF7000;
-	border-color: #FF8000;
-	}
-
-	.items-table {
-	font-size: 18px;
-	}
-	</style>
+	<link href = "static/css/contract_supply_profile.css" rel = "stylesheet">
+	<!------------------------------------ SUPPLY DETAILS ------------------------------------->
 	<div class = "list-group">
 	<div class = "list-group-item">
 	<div style = "padding-top: 10px; padding-bottom: 10px; padding-left: 30px;">
@@ -153,11 +143,15 @@ $content = <<<_HTML
 	</div>
 	</div>
 	</div>
+	<!------------------------------ LINK TO ADD NEW SUPPLY ITEM ------------------------------>
 	<div class = "new-supply">
 	<a href = "../registration/register_supply_item.php" class = "btn btn-primary btn-pill">
 	Add Supply Items to Cart
 	</a>
 	</div>
+	<!---------------------------------- SUPPLY ITEMS TABLE ----------------------------------->
+	<div class = "list-group" style = "margin-top: 3%;">
+	<div class = "list-group-item items-table">
 	<div class = "list-group" style = "margin-top: 3%;">
 	<div class = "list-group-item items-table">
 	<table class = "table table-responsive table-hover table-striped">
@@ -178,7 +172,9 @@ $content = <<<_HTML
 	</table>
 	</div>
 	</div>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+	<!---------------------------------- JAVASCRIPT AND JQUERY -------------------------------->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js">
+	</script>
 	<script>
 		var dateCreated = document.getElementById("dateCreated");
 		var lastUpdated = document.getElementById("lastUpdated");

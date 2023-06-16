@@ -1,0 +1,78 @@
+.personal-info {
+	text-align: center;
+}
+
+.personal-info p {
+	font-family: 'Calibri light';
+	font-size: 20px;
+}
+
+.personal-info-header {
+	padding:3% 0;
+	margin: 4% 0;
+}
+
+.detail {
+	justify: right;
+}
+
+.card {
+	border: none;
+	margin: 20px 0;
+	border-radius: 10px;
+	box-shadow: 0 5px 7px rgba(0, 0, 0, 0.2);
+}
+
+.card-header {
+	background-color: #FF8000;
+	color: #fff;
+	padding: 10px;
+	border-top-left-radius: 10px;
+	border-top-right-radius: 10px;
+}
+
+.card-body {
+	padding: 15px;
+}
+
+.card-title {
+	margin-bottom: 10px;
+	font-weight: bold;
+	font-size: 18px;
+}
+
+.card-text {
+	margin-bottom: 5px;
+}
+
+.fa-icon {
+	margin-right: 5px;
+}
+
+.card-item {
+	display: flex;
+	align-items: center;
+	margin-bottom: 10px;
+	color: #FF8000;
+	color: #000;
+}
+
+.card-item i {
+	margin-right: 10px;
+	color: #FF8000;
+}
+
+.item-name {
+	color: #FF8000;
+	font-weight: bold;
+}
+
+.item-value {
+	margin-left: auto;
+}
+
+.img {
+	display: block;
+	margin-left: auto;
+	margin-right: auto;
+}

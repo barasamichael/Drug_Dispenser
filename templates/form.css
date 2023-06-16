@@ -1,0 +1,100 @@
+.close {
+  background-color: inherit;
+  border: none;
+  outline: none;
+  padding: 0;
+  opacity: 1;
+}
+
+/* Bootstrap 3.3.7 Form Group CSS */
+input[type="submit"] {
+	color: #fff;
+  	background-color: #007bff;
+  	border-color: #007bff;
+}
+
+input[type="submit"]:hover {
+  color: #fff;
+  background-color: #0069d9;
+  border-color: #0062cc;
+}
+
+
+input[type="submit"]:focus, input[type="submit"].focus {
+  box-shadow: 0 0 0 0.2rem rgba(38, 143, 255, 0.5);
+}
+
+input[type="submit"].disabled, input[type="submit"]:disabled {
+  background-color: #007bff;
+  border-color: #007bff;
+}
+
+input[type="submit"]:not(:disabled):not(.disabled):active, input[type="submit"]:not(:disabled):not(.disabled).active,
+.show > input[type="submit"].dropdown-toggle {
+  color: #fff;
+  background-color: #0062cc;
+  border-color: #005cbf;
+}
+
+input[type="submit"]:not(:disabled):not(.disabled):active:focus, input[type="submit"]:not(:disabled):not(.disabled).active:focus,
+.show > input[type="submit"].dropdown-toggle:focus {
+  box-shadow: 0 0 0 0.2rem rgba(38, 143, 255, 0.5);
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+@media (min-width: 768px) {
+  .form-horizontal .form-group {
+    margin-right: -15px;
+    margin-left: -15px;
+  }
+}
+/* Bootstrap 3.3.7 Form Classes CSS */
+
+/* Form control */
+.form-control {
+  display: block;
+  width: 100%;
+  height: 34px;
+  padding: 6px 12px;
+  font-size: 14px;
+  line-height: 1.42857143;
+  color: #555555;
+  background-color: #ffffff;
+  background-image: none;
+  border: 1px solid #cccccc;
+  border-radius: 4px;
+  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+          box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+  -webkit-transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;
+       -o-transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;
+          transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;
+}
+
+/* Form group */
+.form-group {
+  margin-bottom: 15px;
+}
+
+/* Checkbox */
+.checkbox {
+  margin-top: 0;
+  margin-bottom: 10px;
+}
+
+/* Radio */
+.radio {
+  margin-top: 0;
+  margin-bottom: 10px;
+}
+
+/* Static control */
+.form-control-static {
+  padding-top: 7px;
+  padding-bottom: 7px;
+  margin-bottom: 0;
+  min-height: 34px;
+}
+

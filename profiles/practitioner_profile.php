@@ -26,6 +26,7 @@
 require_once("forms.php");
 require_once("views.php");
 require_once('../connect.php');
+require_once('../config.php');
 
 session_start();
 /* ---------------------------------------------------------------------------------------------- *
@@ -178,8 +179,15 @@ $patients_table = <<<_HTML
 	</div>
 	_HTML;
 
-$main_area = $patient_assignment;
-$main_area .= $patients_table;
+/* ---------------------------------------------------------------------------------------------- *
+ *                  FILTER CONTENT VIEWED BY USER BASED ON CURRENT USER ROLE                      *
+ * ---------------------------------------------------------------------------------------------- */
+$main_area = null;
+if ($_SESSION['role'] == 'administrator' || $_SESSION['role'] == 'practitioner')
+{
+	$main_area .= $patient_assignment;
+	$main_area .= $patients_table;
+}
 
 /* ---------------------------------------------------------------------------------------------- *
  *                          ACTUAL HTML CONTENT TO BE SENT TO BASE.PHP                            *

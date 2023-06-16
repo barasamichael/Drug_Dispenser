@@ -126,7 +126,22 @@ if ($_SERVER["REQUEST_METHOD"] === "POST")
 {
 	if (isset($_POST['practitionerId']))
 	{
+		/* patientId is not part of  $_SESSION keys if current user is administrator */
+		if ($_SESSION['role'] == 'administrator')
+		{
+			$_SESSION['patientId'] = $patientId;
+		}
+		
+		/* handle actual entry of patient_practitioner record into database */
 		handlePatientPractitionerAssignmentFormSubmission();
+
+		/* unset the patientId key value record from $_SESSION array if administrator*/
+		if ($_SESSION['role'] == 'administrator')
+		{
+			unset($_SESSION['patientId']);
+		}
+
+		/* refresh patient profile page to reflect commited changes */
 		header("Location: patient_profile.php?patientId=$patientId");
 		exit;
 	}
@@ -180,7 +195,7 @@ $title = $patient['firstName'] . " " . $patient['middleName'] . " " . $patient['
  *                           PATIENT PRACTITIONER ASSIGNMENT FORM                                 *
  * ---------------------------------------------------------------------------------------------- */
 ob_start();
-renderPatientPractitionerAssignmentForm();
+renderPatientPractitionerAssignmentForm($patientId);
 $form = ob_get_clean();
 
 $practitioner_assignment = <<<_HTML
@@ -241,10 +256,29 @@ foreach ($practitioners as $practitioner)
 }
 
 /* ---------------------------------------------------------------------------------------------- *
+ *     	  PATIENTS ARE NOW ALLOWED TO CONFIRM ASSIGNMENT OF PRESCRIPTIONS TO THEMSELVES           *
+ *                                                                                                *
+ * To facilitate this, we need a flag that indicates the role of the current user. Initially,     *
+ * I attempted to use the $_SESSION['role'] value to determine whether the action button should   *
+ * be enabled or disabled.                                                                        *
+ * However, I encountered a problem where the $role variable was only recognized as 0.            *
+ * Upon further investigation, I discovered that JavaScript only recognizes PHP integer variables.*
+ * To address this issue, I decided to assign the value 0 to all other allowed users and 1 to     * 
+ * the patient role. As a result, patients will see a disabled button while other users will      * 
+ * see both enabled and disabled buttons.                                                         *
+ * ---------------------------------------------------------------------------------------------- */
+$role = 0;
+if ($_SESSION['role'] == 'patient')
+{
+	$role = 1;
+}
+
+/* ---------------------------------------------------------------------------------------------- *
  *                  RECORDS OF ALL SUPPLY ITEMS FOR CURRENT SUPPLY INSTANCE                       *
  * ---------------------------------------------------------------------------------------------- */
 $prescriptions_table_data = null;
 $unique_id = 1;
+
 foreach ($prescriptions as $prescription)
 {
 	$prescriptions_table_data .= <<<_HTML
@@ -268,7 +302,7 @@ foreach ($prescriptions as $prescription)
 		{$prescription['lastUpdated']}
 		</td>
 		<td>
-		<a href = "assign_prescription.php?patientId={$patient['patientId']}" class = "btn btn-success" id = "assign-btn-{$unique_id}">
+		<a href = "assign_prescription.php?prescriptionId={$prescription['prescriptionId']}" class = "btn btn-success" id = "assign-btn-{$unique_id}">
 		Assign
 		</a>
 		</td>
@@ -301,7 +335,19 @@ foreach ($prescriptions as $prescription)
 			{
 				assigned.innerText = "Pending";
 				assigned.style.color = "red";
-			}	
+
+				/* patients see disabled buttons */
+				if ($role == 1)
+				{
+					assign_btn.removeAttribute("href");
+					assign_btn.onclick = function(event) {
+						event.preventDefault();
+					};
+					assign_btn.innerText = "Disabled";
+					assign_btn.classList.remove("btn-success");
+					assign_btn.classList.add("btn-danger");
+				}
+			}
 		</script>
 		_HTML;
 	$unique_id += 1;
@@ -391,7 +437,7 @@ if ($_SESSION['role'] == 'practitioner' || $_SESSION['role'] == 'pharmacy'
 	$main_area .= $prescription_table;
 }
 
-if ($_SESSION['role'] == 'practitioner' || $_SESSION['role'] == 'administrator')
+if ($_SESSION['role'] == 'practitioner')
 {
 	$main_area .= $prescription_assignment;
 }
@@ -479,6 +525,7 @@ $content = <<<_HTML
 	</div>
 	</div>
 	<!---------------------------------- JAVASCRIPT AND JQUERY -------------------------------->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
 	<script>
 		// format last seen
 		var lastSeen = document.getElementById("lastSeen");

@@ -239,7 +239,7 @@ $content = <<<_HTML
 	<a href = "" class = "btn btn-update btn-profile-info">Update Profile Information</a>
 	</div>
 	<div>
-	<a href = "list_of_prescriptions.php" class = "btn btn-primary btn-contract btn-large">View Assigned Prescriptions</a>
+	<a style = "margin-top: 3%; width: 98%;" href = "list_of_prescriptions.php" class = "btn btn-primary btn-pill btn-large">View Assigned Prescriptions</a>
 	</div>
 	<!---------------------------------- ASSIGNED CONTRACTS ----------------------------------->
 	<div>

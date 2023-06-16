@@ -44,7 +44,7 @@ class ContractSupervisorAssignmentForm extends CustomForm
 
 class PatientPractitionerAssignmentForm extends CustomForm
 {
-	public function __construct()
+	public function __construct($patientId)
 	{
 		// database credentials
 		$dsn = 'mysql:host=localhost; dbname=drugs_db';
@@ -54,8 +54,11 @@ class PatientPractitionerAssignmentForm extends CustomForm
 		// Retrieve unassigned practitioners from database
 		$dbHandler = new DatabaseHandler($dsn, $username, $password);
 		$dbHandler->connect();
-		$SQL_query = "SELECT practitionerId, firstName, middleName, lastName " .
-			"FROM practitioner";
+		$SQL_query = "SELECT p.practitionerId, p.firstName, p.middleName, p.lastName " .
+			"FROM practitioner AS p WHERE p.practitionerId NOT IN ( " .
+			"SELECT pp.practitionerId FROM patient_practitioner AS pp WHERE " .
+			"pp.patientId = $patientId)";
+
 		$practitioner_result = $dbHandler->selectQuery($SQL_query);
 		$dbHandler->disconnect();
 

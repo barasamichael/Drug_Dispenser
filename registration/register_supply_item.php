@@ -1,13 +1,22 @@
 <?php
-
 require_once "forms.php";
 require_once "views.php";
+session_start();
+/* ---------------------------------------------------------------------------------------------- *
+ *                             ENSURE ALL LINK PARAMETERS PROVIDED                                *
+ * ---------------------------------------------------------------------------------------------- */
+if (!$_GET['contractSupplyId'])
+{
+	header("Location: ../templates/errors/invalid_access.php");
+	exit;
+}
+$contractSupplyId = $_GET['contractSupplyId'];
 
 if ($_SERVER["REQUEST_METHOD"] === "POST")
 {
 	handleSupplyItemEntryFormSubmission();
-	//header("Location: register_supply_item.php");
-	//exit;
+	header("Location: contract_supply_profile.php?contractSupplyId=$contractSupplyId");
+	exit;
 }
 
 # Set page header

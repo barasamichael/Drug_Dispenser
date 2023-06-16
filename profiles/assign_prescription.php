@@ -2,31 +2,45 @@
 require_once('../connect.php');
 require_once('../config.php');
 
+session_start();
+
+/* ---------------------------------------------------------------------------------------------- *
+ *                              ALLOW ADMINISTRATOR AND PHARMACY ACCESS                           *
+ * ---------------------------------------------------------------------------------------------- */
+if ($_SESSION['role'] != 'administrator' && $_SESSION['role'] != 'pharmacy')
+{
+	header("Location: ../templates/errors/403.php");
+	exit;
+}
+
+/* ---------------------------------------------------------------------------------------------- *
+ *                             ENSURE ALL LINK PARAMETERS PROVIDED                                *
+ * ---------------------------------------------------------------------------------------------- */
+if (!$_GET['prescriptionId'])
+{
+	header("Location: ../templates/errors/invalid_access.php");
+	exit;
+}
 $prescriptionId = $_GET['prescriptionId'];
 
-/* --------------------------------------------------------------- *
- *           RETRIEVE RELEVANT RECORDS FROM DATABASE               *
- * --------------------------------------------------------------- */
+
+/* ---------------------------------------------------------------------------------------------- *
+ *                                   UPDATE PRESCRIPTION STATUS                                   *
+ * ---------------------------------------------------------------------------------------------- */
 $databaseHandler = new DatabaseHandler($dsn, $username, $password);
 $databaseHandler->connect();
-
-$prescription_query = "SELECT patientId FROM prescription WHERE " .
-	"prescriptionId = $prescriptionId";
-$update_query = "UPDATE prescription SET assigned = :assigned " .
-	"WHERE prescriptionId = :prescriptionId";
+$update_query = "UPDATE prescription SET assigned = :assigned WHERE prescriptionId = " .
+	":prescriptionId";
 $attributes = ["assigned" => 1, "prescriptionId" => $prescriptionId];
-
-$patientId = $databaseHandler->selectQuery($prescription_query)[0][0];
-
-/* --------------------------------------------------------------- *
- *                  UPDATE PRESCRIPTION STATUS                     *
- * --------------------------------------------------------------- */
 $databaseHandler->executeQuery($update_query, $attributes);
 $databaseHandler->disconnect();
 
-/* --------------------------------------------------------------- *
- *             REDIRECT USER TO PATIENT_PROFILE PAGE               *
- * --------------------------------------------------------------- */
-header("Location: patient_profile.php?patientId = $patientId");
-exit;
+/* ---------------------------------------------------------------------------------------------- *
+ *                                REDIRECT USER TO PREVIOUS PAGE                                  *
+ * ---------------------------------------------------------------------------------------------- */
+echo <<<_HTML
+	<script>
+		window.history.back();
+	</script>
+_HTML;
 ?>

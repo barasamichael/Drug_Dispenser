@@ -89,7 +89,11 @@ $unique_id = 1;
 foreach ($supplies_items as $item) {
 	$supplies_table_data .= <<<_HTML
 		<tr>
-		<td>{$item['contractSupplyId']}</td>
+		<td>
+		<a href = "contract_supply_profile.php?contractSupplyId={$item['contractSupplyId']}">
+		{$item['contractSupplyId']}
+		</a>
+		</td>
 		<td id = "dateCreated{$unique_id}">{$item['dateCreated']}</td>
 		<td>{$item['costPrice']}</td>
 		<td>{$item['sellingPrice']}</td>

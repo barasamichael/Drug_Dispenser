@@ -19,6 +19,11 @@ if ($_SESSION['role'] == 'pharmacy')
 }
 else if ($_SESSION['role'] == 'administrator')
 {
+	if (!$_GET['pharmacyId'])
+	{
+		header("Location: ../templates/errors/invalid_access.php");
+		exit;
+	}
 	$pharmacyId = $_GET['pharmacyId'];
 }
 /* ---------------------------------------------------------------------------------------------- *
@@ -62,14 +67,18 @@ foreach ($prescriptions as $prescription)
 		<tr>
 		<td>{$prescription['prescriptionId']}</td>
 		<td>
+		<a href = "practitioner_profile.php?practitionerId={$prescription['practitionerId']}">
 		{$prescription['practitionerFirstName']} 
 		{$prescription['practitionerMiddleName']} 
 		{$prescription['practitionerLastName']}
+		</a>
 		</td>
 		<td>
+		<a href = "patient_profile.php?patientId={$prescription['patientId']}">
 		{$prescription['patientFirstName']} 
 		{$prescription['patientMiddleName']} 
 		{$prescription['patientLastName']}
+		</a>
 		</td>
 		<td>{$prescription['tradename']}</td>
 		<td>{$prescription['quantity']}</td>
@@ -82,7 +91,7 @@ foreach ($prescriptions as $prescription)
 		{$prescription['lastUpdated']}
 		</td>
 		<td>
-		<a href = "assign_prescription.php?patientId={$prescription['patientId']}" class = "btn btn-success" id = "assign-btn-{$unique_id}">
+		<a href = "assign_prescription.php?prescriptionId={$prescription['prescriptionId']}" class = "btn btn-success" id = "assign-btn-{$unique_id}">
 		Assign
 		</a>
 		</td>
@@ -148,7 +157,7 @@ $content .= <<<_HTML
 /* ---------------------------------------------------------------------------------------------- *
  *                                       DISPLAY HEADING OF PAGE                                  *
  * ---------------------------------------------------------------------------------------------- */
-$title = "Pharmacy Profile ID " . $_SESSION['pharmacyId'] . " - Assigned Prescriptions";
+$title = "Pharmacy Profile ID $pharmacyId - Assigned Prescriptions";
 
 require_once('../templates/base.php');
 ?>

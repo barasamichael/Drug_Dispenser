@@ -1,7 +1,7 @@
 <?php
-
 require_once("forms.php");
 require_once("../models.php");
+
 echo "<link href = '../bootstrap.min.css' rel = 'stylesheet'>";
 echo "<link href = '../static/css/styles.css' rel = 'stylesheet'>";
 
@@ -54,9 +54,9 @@ function handleContractSupervisorAssignmentFormSubmission()
 	}
 }
 
-function renderPatientPractitionerAssignmentForm()
+function renderPatientPractitionerAssignmentForm($patientId)
 {
-	$form = new PatientPractitionerAssignmentForm();
+	$form = new PatientPractitionerAssignmentForm($patientId);
 	echo $form->render();
 }
 

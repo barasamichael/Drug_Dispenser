@@ -24,7 +24,7 @@
 }
 
 .card-header {
-	background-color: #FF8000;
+	background-color: #FF4500;
 	color: #fff;
 	padding: 10px;
 	border-top-left-radius: 10px;
@@ -53,17 +53,17 @@
 	display: flex;
 	align-items: center;
 	margin-bottom: 10px;
-	color: #FF8000;
+	color: #FF4500;
 	color: #000;
 }
 
 .card-item i {
 	margin-right: 10px;
-	color: #FF8000;
+	color: #FF4500;
 }
 
 .item-name {
-	color: #FF8000;
+	color: #FF4500;
 	font-weight: bold;
 }
 

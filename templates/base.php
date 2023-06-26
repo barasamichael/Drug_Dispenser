@@ -4,11 +4,11 @@
 		<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<title>
-		<?php if ($title) echo $title; ?> - MediHelp PLC
+		<?php if ($title) echo $title; ?> | MediHelp PLC
 		</title>
 		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" crossorigin="anonymous" />
 		<link href = "bootstrap.min.css" rel = "stylesheet">
-		<link rel="icon" href="images/favicon.png" type="image/x-icon">
+		<link rel="icon" href="favicon.jpg" type="image/x-icon">
 		<style>
 
 		/* general settings */
@@ -135,12 +135,12 @@
 				<?php 
 				if (isset($_SESSION['logged_in']) && $_SESSION['logged_in']===true)
 				{
-					echo "<a href='../authentication/logout.php'>Sign Out</a>";
+					echo "<a href='/project/authentication/logout.php'>Sign Out</a>";
 				}
 				else
 				{
-					echo "<a href='../authentication/login.php'>Sign In</a>";
-					echo "<a href='../registration/register_patient.php'>Sign Up</a>";
+					echo "<a href='/project/authentication/login.php'>Sign In</a>";
+					echo "<a href='/project/registration/register_patient.php'>Sign Up</a>";
 				}
 				?>
 			</div>

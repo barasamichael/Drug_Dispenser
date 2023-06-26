@@ -30,6 +30,15 @@ require_once('../connect.php');
 
 session_start();
 /* ---------------------------------------------------------------------------------------------- *
+ *                       ONLY LOGGED IN USERS CAN ACCESS THESE CONTENT                            *
+ * ---------------------------------------------------------------------------------------------- */
+if (!isset($_SESSION['role']))
+{
+	header("Location: ../authentication/login.php");
+	exit;
+}
+
+/* ---------------------------------------------------------------------------------------------- *
  *            ALLOW ACCESS TO ADMINISTRATOR, SUPERVISOR, PHARMACY AND PHARMACEUTICAL              *
  * ---------------------------------------------------------------------------------------------- */
 if ($_SESSION['role'] == 'patient' || $_SESSION['role'] == 'practitioner')
@@ -93,7 +102,7 @@ $title = $supervisor['firstName'] . " " . $supervisor['middleName'] . " " . $sup
  *                            CONTRACT SUPERVISOR ASSIGNMENT FORM                                 *
  * ---------------------------------------------------------------------------------------------- */
 ob_start();
-renderContractSupervisorAssignmentForm();
+renderContractSupervisorAssignmentForm($supervisorId);
 $form = ob_get_clean();
 
 $contract_assignment = <<<_HTML
@@ -175,8 +184,15 @@ $contracts_table = <<<_HTML
 	</div>
 	_HTML;
 
-$main_area = $contract_assignment;
-$main_area .= $contracts_table;
+/* ---------------------------------------------------------------------------------------------- *
+ *                  FILTER CONTENT VIEWED BY USER BASED ON CURRENT USER ROLE                      *
+ * ---------------------------------------------------------------------------------------------- */
+$main_area = null;
+if ($_SESSION['role'] == 'supervisor' || $_SESSION['role'] == 'administrator')
+{
+	$main_area .= $contract_assignment;
+	$main_area .= $contracts_table;
+}
 
 /* ---------------------------------------------------------------------------------------------- *
  *                          ACTUAL HTML CONTENT TO BE SENT TO BASE.PHP                            *
@@ -201,7 +217,7 @@ $content = <<<_HTML
 	<p>
 	{$supervisor['emailAddress']}<br>{$supervisor['phoneNumber']}
 	</p>
-	<a class = "btn btn-primary" href = "#">Edit Profile</a>
+	<a class = "btn btn-primary" href = "../registration/edit_supervisor_profile.php?supervisorId={$supervisorId}">Edit Profile</a>
 	</div>
 
 	<!------------------------------ LOWER SIDEBAR PROFILE DETAILS ---------------------------->

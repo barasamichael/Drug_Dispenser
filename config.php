@@ -2,4 +2,7 @@
 $dsn = 'mysql:host=localhost; dbname=drugs_db';
 $username = 'root';
 $password = 'MySQLXXX-123a8910';
+
+// Pagination Settings
+$perPage=7;
 ?>

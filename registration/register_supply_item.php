@@ -1,7 +1,8 @@
 <?php
+session_start();
 require_once "forms.php";
 require_once "views.php";
-session_start();
+
 /* ---------------------------------------------------------------------------------------------- *
  *                             ENSURE ALL LINK PARAMETERS PROVIDED                                *
  * ---------------------------------------------------------------------------------------------- */
@@ -14,8 +15,8 @@ $contractSupplyId = $_GET['contractSupplyId'];
 
 if ($_SERVER["REQUEST_METHOD"] === "POST")
 {
-	handleSupplyItemEntryFormSubmission();
-	header("Location: contract_supply_profile.php?contractSupplyId=$contractSupplyId");
+	handleSupplyItemEntryFormSubmission($contractSupplyId);
+	header("Location: ../profiles/contract_supply_profile.php?contractSupplyId=$contractSupplyId");
 	exit;
 }
 

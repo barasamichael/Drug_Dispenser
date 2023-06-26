@@ -1,22 +1,19 @@
 <?php
-
 require_once(__DIR__ . "/../custom_form.php");
 require_once(__DIR__ . "/../fields.php");
+require_once(__DIR__ . "/../config.php");
 
 class ContractSupervisorAssignmentForm extends CustomForm
 {
-	public function __construct()
+	public function __construct($supervisorId)
 	{
-		// database credentials
-		$dsn = 'mysql:host=localhost; dbname=drugs_db';
-		$username = 'root';
-		$password = 'MySQLXXX-123a8910';
-		
+		global $dsn, $username, $password;
 		// Retrieve unassigned practitioners from database
 		$dbHandler = new DatabaseHandler($dsn, $username, $password);
 		$dbHandler->connect();
-		$SQL_query = "SELECT contractId FROM contract";
-		$contract_result = $dbHandler->selectQuery($SQL_query);
+		$SQL_query = "SELECT contractId FROM contract WHERE contractId NOT IN ( " . 
+			"SELECT contractId FROM contract_supervisor WHERE supervisorId = ?)";
+		$contract_result = $dbHandler->selectQuery($SQL_query, [$supervisorId]);
 		$dbHandler->disconnect();
 
 		$contracts = [];
@@ -46,11 +43,7 @@ class PatientPractitionerAssignmentForm extends CustomForm
 {
 	public function __construct($patientId)
 	{
-		// database credentials
-		$dsn = 'mysql:host=localhost; dbname=drugs_db';
-		$username = 'root';
-		$password = 'MySQLXXX-123a8910';
-		
+		global $dsn, $username, $password;
 		// Retrieve unassigned practitioners from database
 		$dbHandler = new DatabaseHandler($dsn, $username, $password);
 		$dbHandler->connect();
@@ -101,11 +94,7 @@ class PrescriptionAssignmentForm extends CustomForm
 {
 	public function __construct()
 	{
-		// database credentials
-		$dsn = 'mysql:host=localhost; dbname=drugs_db';
-		$username = 'root';
-		$password = 'MySQLXXX-123a8910';
-		
+		global $dsn, $username, $password;
 		// Retrieve unassigned patients from database
 		$dbHandler = new DatabaseHandler($dsn, $username, $password);
 		$dbHandler->connect();
@@ -154,11 +143,7 @@ class PractitionerPatientAssignmentForm extends CustomForm
 {
 	public function __construct()
 	{
-		// database credentials
-		$dsn = 'mysql:host=localhost; dbname=drugs_db';
-		$username = 'root';
-		$password = 'MySQLXXX-123a8910';
-		
+		global $dsn, $username, $password;
 		// Retrieve unassigned patients from database
 		$dbHandler = new DatabaseHandler($dsn, $username, $password);
 		$dbHandler->connect();
@@ -206,11 +191,7 @@ class RegisterSupplyItemForm extends CustomForm
 {
 	public function __construct()
 	{
-		// database credentials
-		$dsn = 'mysql:host=localhost; dbname=drugs_db';
-		$username = 'root';
-		$password = 'MySQLXXX-123a8910';
-		
+		global $dsn, $username, $password;
 		// Retrieve drugs from database
 		$dbHandler = new DatabaseHandler($dsn, $username, $password);
 		$dbHandler->connect();

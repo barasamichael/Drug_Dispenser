@@ -11,7 +11,7 @@ ob_start();
 renderLoginForm();
 
 $content = ob_get_clean();
-$title = "Patient Login";
+$title = "Login";
 
 include "../templates/base.php";
 ?>

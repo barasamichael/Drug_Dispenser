@@ -45,3 +45,11 @@ ul.list-unstyled li {
 .items-table {
 	font-size: 18px;
 }
+
+.supervisors {
+	margin-left: 0;
+}
+
+.supervisors h3 {
+	color: red;
+}

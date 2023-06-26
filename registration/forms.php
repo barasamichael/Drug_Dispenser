@@ -35,11 +35,7 @@ class RegisterContractForm extends CustomForm
 {
 	public function __construct()
 	{
-		// database credentials
-		$dsn = 'mysql:host=localhost; dbname=drugs_db';
-		$username = 'root';
-		$password = 'MySQLXXX-123a8910';
-
+		global $dsn, $username, $password;
 		// Retrieve patient details from database
 		$dbHandler = new DatabaseHandler($dsn, $username, $password);
 		$dbHandler->connect();
@@ -183,11 +179,7 @@ class SupplyItemEntryForm extends CustomForm
 {
 	public function __construct()
 	{
-		// database credentials
-		$dsn = 'mysql:host=localhost; dbname=drugs_db';
-		$username = 'root';
-		$password = 'MySQLXXX-123a8910';
-
+		global $dsn, $username, $password;
 		// Retrieve patient details from database
 		$dbHandler = new DatabaseHandler($dsn, $username, $password);
 		$dbHandler->connect();
@@ -246,6 +238,322 @@ class SupplyItemEntryForm extends CustomForm
 		$this->addField($quantity);
 		$this->addField($costPrice);
 		$this->addField($sellingPrice);
+		$this->addField($submit);
+	}
+}
+
+class EditPractitionerProfileForm extends CustomForm
+{
+	public function __construct($practitionerId)
+	{
+		global $dsn, $username, $password;
+		// Retrieve specialty details from database
+		$dbHandler = new DatabaseHandler($dsn, $username, $password);
+		$dbHandler->connect();
+		$specialty_result = $dbHandler->selectQuery(
+			'SELECT specialtyId, title FROM specialty');
+		$practitioner_query = "SELECT * FROM practitioner WHERE practitionerId = ?";
+		$practitioner = $dbHandler->selectQuery($practitioner_query, [$practitionerId])[0];
+
+		$dbHandler->disconnect();
+
+		$specialties = [];
+		foreach ($specialty_result as $row)
+		{
+			$specialties[$row['specialtyId']] = $row['title'];
+		}
+
+		// set form fields
+		$SSN = new IntegerField([
+			"name" => "SSN",
+			"label" => "Social Security Number",
+			"required" => true,
+			"value" => $practitioner['SSN']
+		]);
+		$firstName = new StringField([
+			"name" => "firstName",
+			"label" => "First name",
+			"required" => true,
+			"value" => $practitioner['firstName']
+		]);
+		$middleName = new StringField([
+			"name" => "middleName",
+			"label" => "Middle name",
+			"value" => $practitioner['middleName']
+		]);
+		$lastName = new StringField([
+			"name" => "lastName",
+			"label" => "Last name",
+			"value" => $practitioner['lastName']
+		]);
+		$gender = new SelectField([
+			"name" => "gender",
+			"label" => "Gender",
+			"required" => true,
+			"options" => [
+				"Male" => "Male",
+				"Female" => "Female"
+			],
+			"value" => $practitioner['gender']
+		]);
+		$specialtyId = new SelectField([
+			"name" => "specialtyId",
+			"label" => "Select Area of Specialty",
+			"required" => true,
+			"options" => $specialties,
+			"value" => $practitioner['specialtyId']
+		]);
+		$activeYear = new IntegerField([
+			"name" => "activeYear",
+			"label" => "Year Begun as Practitioner",
+			"required" => true,
+			"value" => $practitioner['activeYear']
+		]);
+		$dateOfBirth = new DateField([
+			"name" => "dateOfBirth",
+			"label" => "Date of birth",
+			"required" => true,
+			"value" => $practitioner['dateOfBirth']
+		]);
+		$phoneNumber = new StringField([
+			"name" => "phoneNumber",
+			"label" => "Phone number",
+			"required" => true,
+			"value" => $practitioner['phoneNumber']
+		]);
+		$submit = new SubmitField([
+			"name" => "submit",
+			"label" => "Commit Changes"
+		]);
+
+		$this->addField($SSN);
+		$this->addField($firstName);
+		$this->addField($middleName);
+		$this->addField($lastName);
+		$this->addField($gender);
+		$this->addField($dateOfBirth);
+		$this->addField($activeYear);
+		$this->addField($specialtyId);
+		$this->addField($phoneNumber);
+		$this->addField($submit);
+	}
+}
+
+class EditSupervisorProfileForm extends CustomForm
+{
+	public function __construct($supervisorId)
+	{
+		global $dsn, $username, $password;
+		// Retrieve supervisor details from database
+		$dbHandler = new DatabaseHandler($dsn, $username, $password);
+		$dbHandler->connect();
+		$supervisor = $dbHandler->selectQuery(
+			'SELECT * FROM supervisor WHERE supervisorId = ?', [$supervisorId])[0];
+		$dbHandler->disconnect();
+		
+		$firstName = new StringField([
+			"name" => "firstName",
+			"label" => "First name",
+			"required" => true,
+			"value" => $supervisor['firstName']
+		]);
+		$middleName = new StringField([
+			"name" => "middleName",
+			"label" => "Middle name",
+			"value" => $supervisor['middleName']
+		]);
+		$lastName = new StringField([
+			"name" => "lastName",
+			"label" => "Last name",
+			"value" => $supervisor['lastName']
+		]);
+		$phoneNumber = new StringField([
+			"name" => "phoneNumber",
+			"label" => "Phone number",
+			"required" => true,
+			"value" => $supervisor['phoneNumber']
+		]);
+		$submit = new SubmitField([
+			"name" => "submit",
+			"label" => "Commit Changes"
+		]);
+
+		$this->addField($firstName);
+		$this->addField($middleName);
+		$this->addField($lastName);
+		$this->addField($phoneNumber);
+		$this->addField($submit);
+	}
+}
+
+class EditPharmacyProfileForm extends CustomForm
+{
+	public function __construct($pharmacyId)
+	{
+		global $dsn, $username, $password;
+		// Retrieve specialty details from database
+		$dbHandler = new DatabaseHandler($dsn, $username, $password);
+		$dbHandler->connect();
+		$pharmacy_result = $dbHandler->selectQuery(
+			'SELECT * FROM pharmacy WHERE pharmacyId = ?', [$pharmacyId]);
+		$pharmacy = $pharmacy_result[0];
+		$dbHandler->disconnect();
+		
+		$title = new StringField([
+			"name" => "title",
+			"label" => "Title",
+			"required" => true,
+			"value" => $pharmacy['title']
+		]);
+
+		$locationAddress = new StringField([
+			"name" => "locationAddress",
+			"label" => "Location Address",
+			"required" => true,
+			"value" => $pharmacy['locationAddress']
+		]);
+
+		$phoneNumber = new StringField([
+			"name" => "phoneNumber",
+			"label" => "Phone Number",
+			"required" => true,
+			"value" => $pharmacy['phoneNumber']
+		]);
+
+		$submit = new SubmitField([
+			"name" => "submit",
+			"label" => "Commit Changes"
+		]);
+
+		$this->addField($title);
+		$this->addField($phoneNumber);
+		$this->addField($locationAddress);
+		$this->addField($submit);
+	}
+}
+
+class EditPharmaceuticalProfileForm extends CustomForm
+{
+	public function __construct($pharmaceuticalId)
+	{
+		global $dsn, $username, $password;
+		// Retrieve specialty details from database
+		$dbHandler = new DatabaseHandler($dsn, $username, $password);
+		$dbHandler->connect();
+		$pharmaceutical_result = $dbHandler->selectQuery(
+			'SELECT * FROM pharmaceutical WHERE pharmaceuticalId = ?', [$pharmaceuticalId]);
+		$pharmaceutical = $pharmaceutical_result[0];
+		$dbHandler->disconnect();
+		
+		$title = new StringField([
+			"name" => "title",
+			"label" => "Title",
+			"required" => true,
+			"value" => $pharmaceutical['title']
+		]);
+
+		$locationAddress = new StringField([
+			"name" => "locationAddress",
+			"label" => "Location Address",
+			"required" => true,
+			"value" => $pharmaceutical['locationAddress']
+		]);
+
+		$phoneNumber = new StringField([
+			"name" => "phoneNumber",
+			"label" => "Phone Number",
+			"required" => true,
+			"value" => $pharmaceutical['phoneNumber']
+		]);
+
+		$submit = new SubmitField([
+			"name" => "submit",
+			"label" => "Commit Changes"
+		]);
+
+		$this->addField($title);
+		$this->addField($phoneNumber);
+		$this->addField($locationAddress);
+		$this->addField($submit);
+	}
+}
+
+class EditPatientProfileForm extends CustomForm
+{
+	public function __construct($patientId)
+	{
+		global $dsn, $username, $password;
+		// Retrieve specialty details from database
+		$dbHandler = new DatabaseHandler($dsn, $username, $password);
+		$dbHandler->connect();
+		$patient_result = $dbHandler->selectQuery(
+			'SELECT * FROM patient WHERE patientId = ?', [$patientId]);
+		$patient = $patient_result[0];
+		$dbHandler->disconnect();
+
+		$SSN = new IntegerField([
+			"name" => "SSN",
+			"label" => "Social Security Number",
+			"required" => true,
+			"value" => $patient['SSN']
+		]);
+		$firstName = new StringField([
+			"name" => "firstName",
+			"label" => "First name",
+			"required" => true,
+			"value" => $patient['firstName']
+		]);
+		$middleName = new StringField([
+			"name" => "middleName",
+			"label" => "Middle name",
+			"value" => $patient['middleName']
+		]);
+		$lastName = new StringField([
+			"name" => "lastName",
+			"label" => "Last name",
+			"value" => $patient['lastName']
+		]);
+		$gender = new SelectField([
+			"name" => "gender",
+			"label" => "Gender",
+			"required" => true,
+			"options" => [
+				"Male" => "Male",
+				"Female" => "Female"
+			],
+			"value" => $patient['gender']
+		]);
+		$dateOfBirth = new DateField([
+			"name" => "dateOfBirth",
+			"label" => "Date of birth",
+			"required" => true,
+			"value" => $patient['dateOfBirth']
+		]);
+		$phoneNumber = new StringField([
+			"name" => "phoneNumber",
+			"label" => "Phone number",
+			"required" => true,
+			"value" => $patient['phoneNumber']
+		]);
+		$residentialAddress = new StringField([
+			"name" => "residentialAddress",
+			"label" => "Residential Address",
+			"required" => true,
+			"value" => $patient['residentialAddress']
+		]);
+		$submit = new SubmitField([
+			"name" => "submit",
+			"label" => "Commit Changes"
+		]);
+
+		$this->addField($SSN);
+		$this->addField($firstName);
+		$this->addField($middleName);
+		$this->addField($lastName);
+		$this->addField($gender);
+		$this->addField($dateOfBirth);
+		$this->addField($phoneNumber);
+		$this->addField($residentialAddress);
 		$this->addField($submit);
 	}
 }
@@ -330,11 +638,7 @@ class RegisterPractitionerForm extends CustomForm
 {
 	public function __construct()
 	{
-		// database credentials
-		$dsn = 'mysql:host=localhost; dbname=drugs_db';
-		$username = 'root';
-		$password = 'MySQLXXX-123a8910';
-
+		global $dsn, $username, $password;
 		// Retrieve specialty details from database
 		$dbHandler = new DatabaseHandler($dsn, $username, $password);
 		$dbHandler->connect();

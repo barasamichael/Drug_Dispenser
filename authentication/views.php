@@ -1,5 +1,4 @@
 <?php
-
 require_once("forms.php");
 require_once("../connect.php");
 
@@ -76,7 +75,7 @@ function renderLoginForm()
 
 	echo <<<_END
 		<div class = "login-form">
-		<h2>Patient Login</h2>
+		<h2>Login</h2>
 		_END;
 	echo $form->render();
 	echo <<<_END
@@ -143,7 +142,7 @@ function handleLoginFormSubmission()
 
 		case "Practitioner":
 			$sql_query = "SELECT * FROM practitioner WHERE emailAddress=:emailAddress";
-			$practitioner_result = $dbHandler->selectQuery($sql_query, 
+			$practitioner_result = $dbHandler->selectQuery($sql_query,
 				["emailAddress" => $emailAddress]);
 			$dbHandler->disconnect();
 			
@@ -265,8 +264,7 @@ function handleLoginFormSubmission()
 		case "Administrator":
 			start_session();
 			$_SESSION['role'] = 'administrator';
-			header("Location: ../profiles/pharmaceutical_profile.php" .
-				"?pharmaceuticalId=2");
+			header("Location: ../administrator_profile.php");
 			exit;
 
 		default:

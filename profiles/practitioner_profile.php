@@ -30,6 +30,15 @@ require_once('../config.php');
 
 session_start();
 /* ---------------------------------------------------------------------------------------------- *
+ *                       ONLY LOGGED IN USERS CAN ACCESS THESE CONTENT                            *
+ * ---------------------------------------------------------------------------------------------- */
+if (!isset($_SESSION['role']))
+{
+	header("Location: ../authentication/login.php");
+	exit;
+}
+
+/* ---------------------------------------------------------------------------------------------- *
  *                 ALLOW ACCESS TO ADMINISTRATOR, PHARMACY, PATIENT AND PRACTITIONER              *
  * ---------------------------------------------------------------------------------------------- */
 if ($_SESSION['role'] == 'supervisor')
@@ -49,15 +58,6 @@ if (!$_GET['practitionerId'])
 }
 $practitionerId = $_GET['practitionerId'];
 
-/* ---------------------------------------------------------------------------------------------- *
- *                                  PREVENT CROSS PROFILE VIEWS                                   *
- * ---------------------------------------------------------------------------------------------- */
-if ($_SESSION['role'] == 'practitioner' && $practitionerId != $_SESSION['practitionerId'])
-{
-	http_response_code(403);
-	header("Location: ../templates/errors/403.php");
-	exit;
-}
 /* ---------------------------------------------------------------------------------------------- *
  *                                      HANDLE ALL POST REQUESTS                                  *
  * ---------------------------------------------------------------------------------------------- */
@@ -190,6 +190,14 @@ if ($_SESSION['role'] == 'administrator' || $_SESSION['role'] == 'practitioner')
 }
 
 /* ---------------------------------------------------------------------------------------------- *
+ *            PRACTITIONERS CAN SEE RECORDS OF PATIENT ASSIGNMENTS BELONGING TO THEM ONLY         *
+ * ---------------------------------------------------------------------------------------------- */
+if ($_SESSION['role'] == 'practitioner' && $_SESSION['practitionerId'] != $practitionerId)
+{
+	$main_area = null;
+}
+
+/* ---------------------------------------------------------------------------------------------- *
  *                          ACTUAL HTML CONTENT TO BE SENT TO BASE.PHP                            *
  * ---------------------------------------------------------------------------------------------- */
 $content = <<<_HTML
@@ -212,7 +220,7 @@ $content = <<<_HTML
 	<p>
 	{$practitioner['emailAddress']}<br>{$practitioner['phoneNumber']}
 	</p>
-	<a class = "btn btn-primary" href = "#">Edit Profile</a>
+	<a class = "btn btn-primary" href = "../registration/edit_practitioner_profile.php?practitionerId={$practitionerId}">Edit Profile</a>
 	</div>
 
 	<!------------------------------ LOWER SIDEBAR PROFILE DETAILS ---------------------------->

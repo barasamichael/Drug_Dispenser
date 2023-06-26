@@ -2,6 +2,7 @@
 
 require_once("forms.php");
 require_once("../models.php");
+require_once("../config.php");
 echo "<link href = '../bootstrap.min.css' rel = 'stylesheet'>";
 echo "<link href = '../static/css/styles.css' rel = 'stylesheet'>";
 
@@ -10,6 +11,183 @@ function sanitizeForm()
 	foreach ($_POST as $key => $value)
 	{
 		$_POST[$key] = filter_var($value, FILTER_SANITIZE_STRING);
+	}
+}
+
+function renderEditPatientProfileForm($patientId)
+{
+	$form = new EditPatientProfileForm($patientId);
+	echo $form->render();
+}
+
+function renderEditPractitionerProfileForm($practitionerId)
+{
+	$form = new EditPractitionerProfileForm($practitionerId);
+	echo $form->render();
+}
+
+function renderEditPharmacyProfileForm($pharmacyId)
+{
+	$form = new EditPharmacyProfileForm($pharmacyId);
+	echo $form->render();
+}
+
+function renderEditPharmaceuticalProfileForm($pharmaceuticalId)
+{
+	$form = new EditPharmaceuticalProfileForm($pharmaceuticalId);
+	echo $form->render();
+}
+
+function renderEditSupervisorProfileForm($supervisorId)
+{
+	$form = new EditSupervisorProfileForm($supervisorId);
+	echo $form->render();
+}
+
+function handleEditPractitionerProfileFormSubmission($practitionerId)
+{
+	if ($_SERVER['REQUEST_METHOD'] === 'POST')
+	{
+		sanitizeForm();
+
+		$firstName = $_POST['firstName'];
+		$middleName = $_POST['middleName'];
+		$lastName = $_POST['lastName'];
+		$gender = $_POST['gender'];
+		$phoneNumber = $_POST['phoneNumber'];
+		$specialtyId = $_POST['specialtyId'];
+		$dateOfBirth = $_POST['dateOfBirth'];
+		$SSN = $_POST['SSN'];
+		$activeYear = $_POST['activeYear'];
+
+		global $dsn, $username, $password;
+		// Retrieve specialty details from database
+		$dbHandler = new DatabaseHandler($dsn, $username, $password);
+		$dbHandler->connect();
+		$practitioner_result = $dbHandler->selectQuery(
+			'SELECT * FROM practitioner WHERE practitionerId = ?', [$practitionerId]);
+		$practitioner = $practitioner_result[0];
+
+		$updateQuery = "UPDATE practitioner SET SSN = ?, firstName = ?, middleName = ?, " .
+			"lastName = ?, gender = ?, specialtyId = ?, phoneNumber = ?, " .
+			"dateOfBirth = ?, activeYear = ? WHERE practitionerId = ?";
+		$values = [$SSN, $firstName, $middleName, $lastName, $gender, $specialtyId, 
+			$phoneNumber, $dateOfBirth, $activeYear, $practitionerId];
+		$dbHandler->executeQuery($updateQuery, $values);
+		$dbHandler->disconnect();
+	}
+}
+
+function handleEditSupervisorProfileFormSubmission($supervisorId)
+{
+	if ($_SERVER['REQUEST_METHOD'] === 'POST')
+	{
+		sanitizeForm();
+
+		$firstName = $_POST['firstName'];
+		$middleName = $_POST['middleName'];
+		$lastName = $_POST['lastName'];
+		$phoneNumber = $_POST['phoneNumber'];
+
+		global $dsn, $username, $password;
+		// Retrieve specialty details from database
+		$dbHandler = new DatabaseHandler($dsn, $username, $password);
+		$dbHandler->connect();
+		$supervisor_result = $dbHandler->selectQuery(
+			'SELECT * FROM supervisor WHERE supervisorId = ?', [$supervisorId]);
+		$supervisor = $supervisor_result[0];
+
+		$updateQuery = "UPDATE supervisor SET firstName = ?, middleName = ?, " .
+			"lastName = ?, phoneNumber = ? WHERE supervisorId = ?";
+		$values = [$firstName, $middleName, $lastName, $phoneNumber, $supervisorId];
+		$dbHandler->executeQuery($updateQuery, $values);
+		$dbHandler->disconnect();
+	}
+}
+
+function handleEditPharmacyProfileFormSubmission($pharmacyId)
+{
+	if ($_SERVER['REQUEST_METHOD'] === 'POST')
+	{
+		sanitizeForm();
+
+		$title = $_POST['title'];
+		$locationAddress = $_POST['locationAddress'];
+		$phoneNumber = $_POST['phoneNumber'];
+
+		global $dsn, $username, $password;
+		// Retrieve specialty details from database
+		$dbHandler = new DatabaseHandler($dsn, $username, $password);
+		$dbHandler->connect();
+		$pharmacy_result = $dbHandler->selectQuery(
+			'SELECT * FROM pharmacy WHERE pharmacyId = ?', [$pharmacyId]);
+		$pharmacy = $pharmacy_result[0];
+
+		$updateQuery = "UPDATE pharmacy SET title = ?, locationAddress = ?, " . 
+			"phoneNumber = ? WHERE pharmacyId = ?";
+		$values = [$title, $locationAddress, $phoneNumber, $pharmacyId];
+		$dbHandler->executeQuery($updateQuery, $values);
+		$dbHandler->disconnect();
+	}
+}
+
+function handleEditPharmaceuticalProfileFormSubmission($pharmaceuticalId)
+{
+	if ($_SERVER['REQUEST_METHOD'] === 'POST')
+	{
+		sanitizeForm();
+
+		$title = $_POST['title'];
+		$locationAddress = $_POST['locationAddress'];
+		$phoneNumber = $_POST['phoneNumber'];
+
+		global $dsn, $username, $password;
+		// Retrieve specialty details from database
+		$dbHandler = new DatabaseHandler($dsn, $username, $password);
+		$dbHandler->connect();
+		$pharmaceutical_result = $dbHandler->selectQuery(
+			'SELECT * FROM pharmaceutical WHERE pharmaceuticalId = ?', 
+			[$pharmaceuticalId]);
+		$pharmaceutical = $pharmaceutical_result[0];
+
+		$updateQuery = "UPDATE pharmaceutical SET title = ?, locationAddress = ?, " . 
+			"phoneNumber = ? WHERE pharmaceuticalId = ?";
+		$values = [$title, $locationAddress, $phoneNumber, $pharmaceuticalId];
+		$dbHandler->executeQuery($updateQuery, $values);
+		$dbHandler->disconnect();
+	}
+}
+
+function handleEditPatientProfileFormSubmission($patientId)
+{
+	if ($_SERVER['REQUEST_METHOD'] === 'POST')
+	{
+		sanitizeForm();
+
+		$firstName = $_POST['firstName'];
+		$middleName = $_POST['middleName'];
+		$lastName = $_POST['lastName'];
+		$gender = $_POST['gender'];
+		$phoneNumber = $_POST['phoneNumber'];
+		$residentialAddress = $_POST['residentialAddress'];
+		$dateOfBirth = $_POST['dateOfBirth'];
+		$SSN = $_POST['SSN'];
+
+		global $dsn, $username, $password;
+		// Retrieve specialty details from database
+		$dbHandler = new DatabaseHandler($dsn, $username, $password);
+		$dbHandler->connect();
+		$patient_result = $dbHandler->selectQuery(
+			'SELECT * FROM patient WHERE patientId = ?', [$patientId]);
+		$patient = $patient_result[0];
+
+		$updateQuery = "UPDATE patient SET SSN = ?, firstName = ?, middleName = ?, " .
+			"lastName = ?, gender = ?, residentialAddress = ?, phoneNumber = ?, " .
+			"dateOfBirth = ? WHERE patientId = ?";
+		$values = [$SSN, $firstName, $middleName, $lastName, $gender, $residentialAddress, 
+			$phoneNumber, $dateOfBirth, $patientId];
+		$dbHandler->executeQuery($updateQuery, $values);
+		$dbHandler->disconnect();
 	}
 }
 
@@ -104,13 +282,13 @@ function renderSupplyItemEntryForm()
 	echo $form->render();
 }
 
-function handleSupplyItemEntryFormSubmission()
+function handleSupplyItemEntryFormSubmission($contractSupplyId)
 {
 	if ($_SERVER['REQUEST_METHOD'] === 'POST')
 	{
 		sanitizeForm();
 		$supplyItem = new SupplyItem([
-			"contractSupplyId" => 3,
+			"contractSupplyId" => $contractSupplyId,
 			"drugId" => $_POST['drugId'],
 			"tradename" => $_POST['tradename'],
 			"quantity" => $_POST['quantity'],

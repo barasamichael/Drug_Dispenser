@@ -1,0 +1,44 @@
+.container {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	margin-top: 50px;
+	margin-bottom: 0;
+	padding-bottom: 0;
+}
+
+.contact-form {
+	flex: 1;
+	padding: 30px;
+}
+
+.contact-form h2 {
+	color: #FF4500;
+	margin-bottom: 20px;
+}
+
+form input,
+form textarea {
+	width: 100%;
+	padding: 10px;
+	margin-bottom: 15px;
+	border: 1px solid #ccc;
+	border-radius: 5px;
+}
+
+form textarea {
+	height: 120px;
+}
+
+button[type="submit"] {
+	background-color: #FF4500;
+	color: #fff;
+	padding: 10px 20px;
+	border: none;
+	border-radius: 5px;
+	cursor: pointer;
+}
+
+button[type="submit"]:hover {
+	background-color: #555;
+}

@@ -28,6 +28,15 @@ require_once('../config.php');
 
 session_start();
 /* ---------------------------------------------------------------------------------------------- *
+ *                       ONLY LOGGED IN USERS CAN ACCESS THESE CONTENT                            *
+ * ---------------------------------------------------------------------------------------------- */
+if (!isset($_SESSION['role']))
+{
+	header("Location: ../authentication/login.php");
+	exit;
+}
+
+/* ---------------------------------------------------------------------------------------------- *
  *            ALLOW ACCESS TO ADMINISTRATOR, SUPERVISOR, PHARMACY AND PHARMACEUTICAL              *
  * ---------------------------------------------------------------------------------------------- */
 if ($_SESSION['role'] == 'patient' || $_SESSION['role'] == 'practitioner')
@@ -219,6 +228,30 @@ foreach ($contracts as $contract)
 }
 
 /* ---------------------------------------------------------------------------------------------- *
+ *             ONLY THE ADMINISTRATOR AND PHARMACEUTICAL CAN VIEW OPTIONAL SECTION                *
+ * ---------------------------------------------------------------------------------------------- */
+$optional_section = <<<_HTML
+	<div class = "update-info">
+	<a href = "" class = "btn btn-update btn-profile-image">Update Profile Image</a>
+	<a href = "../registration/edit_pharmacy_profile.php?pharmacyId={$pharmacyId}" class = "btn btn-update btn-profile-info">Update Profile Information</a>
+	</div>
+	<div>
+	<a style = "margin-top: 3%; width: 98%;" href = "list_of_prescriptions.php?pharmacyId={$pharmacyId}" class = "btn btn-primary btn-pill btn-large">
+	View Assigned Prescriptions
+	</a>
+	</div>
+	<!---------------------------------- ASSIGNED CONTRACTS ----------------------------------->
+	<div>
+	$contracts_section
+	</div>
+	_HTML;
+
+if ($_SESSION['role'] != 'pharmacy' && $_SESSION['role'] != 'administrator')
+{
+	$optional_section = null;
+}
+
+/* ---------------------------------------------------------------------------------------------- *
  *                          ACTUAL HTML CONTENT TO BE SENT TO BASE.PHP                            *
  * ---------------------------------------------------------------------------------------------- */
 $content = <<<_HTML
@@ -234,17 +267,7 @@ $content = <<<_HTML
 	$company_information
 	</div>
 	</div>
-	<div class = "update-info">
-	<a href = "" class = "btn btn-update btn-profile-image">Update Profile Image</a>
-	<a href = "" class = "btn btn-update btn-profile-info">Update Profile Information</a>
-	</div>
-	<div>
-	<a style = "margin-top: 3%; width: 98%;" href = "list_of_prescriptions.php" class = "btn btn-primary btn-pill btn-large">View Assigned Prescriptions</a>
-	</div>
-	<!---------------------------------- ASSIGNED CONTRACTS ----------------------------------->
-	<div>
-	$contracts_section
-	</div>
+	$optional_section
 	<!---------------------------------- JAVASCRIPT AND JQUERY -------------------------------->
 	<script>
 		// is pharmaceutical active?

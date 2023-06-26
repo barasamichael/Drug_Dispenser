@@ -45,6 +45,15 @@ require_once('../connect.php');
 require_once('../config.php');
 
 session_start();
+/* ---------------------------------------------------------------------------------------------- *
+ *                       ONLY LOGGED IN USERS CAN ACCESS THESE CONTENT                            *
+ * ---------------------------------------------------------------------------------------------- */
+if (!isset($_SESSION['role']))
+{
+	header("Location: ../authentication/login.php");
+	exit;
+}
+
 
 /* ---------------------------------------------------------------------------------------------- *
  *             ALLOW ADMINISTRATOR, PHARMACY, PRACTITIONER AND PATIENT ACCESS                     *
@@ -105,17 +114,15 @@ else if ($_SESSION['role'] == 'practitioner')
 		" LIMIT 1";	
 	$result = $databaseHandler->selectQuery($query, ["patientId" => $patientId, 
 		"practitionerId" => $_SESSION['practitionerId']]);
-	try
+
+	/* prevent practitioner from accessing records of a patient they are not assigned to */
+	if (count($result) == 0)
 	{
-		$patientPractitonerId = $result[0]['patientPractitionerId'];
-	}
-	catch (Exception $e)
-	{
-		/* practitioner wants to access records of a patient they are not assigned to */
 		http_response_code(403);
 		header("Location: ../templates/errors/403.php");
 		exit;
 	}
+	$patientPractitionerId = $result[0]['patientPractitionerId'];
 }
 $databaseHandler->disconnect();
 
@@ -256,7 +263,7 @@ foreach ($practitioners as $practitioner)
 }
 
 /* ---------------------------------------------------------------------------------------------- *
- *     	  PATIENTS ARE NOW ALLOWED TO CONFIRM ASSIGNMENT OF PRESCRIPTIONS TO THEMSELVES           *
+ *      PATIENTS AND PRACTITIONERS ARE NOW ALLOWED TO CONFIRM ASSIGNMENT OF PRESCRIPTIONS         *
  *                                                                                                *
  * To facilitate this, we need a flag that indicates the role of the current user. Initially,     *
  * I attempted to use the $_SESSION['role'] value to determine whether the action button should   *
@@ -268,7 +275,7 @@ foreach ($practitioners as $practitioner)
  * see both enabled and disabled buttons.                                                         *
  * ---------------------------------------------------------------------------------------------- */
 $role = 0;
-if ($_SESSION['role'] == 'patient')
+if ($_SESSION['role'] == 'patient' || $_SESSION['role'] == 'practitioner')
 {
 	$role = 1;
 }
@@ -465,7 +472,7 @@ $content = <<<_HTML
 	{$patient['phoneNumber']}
 	</a>
 	</p>
-	<a class = "btn btn-primary" href = "#">Edit Profile</a>
+	<a class = "btn btn-primary" href = "../registration/edit_patient_profile.php?patientId={$patientId}" id = "editProfile" href = "#">Edit Profile</a>
 	</div>
 	<!---------------------------- LOWER SIDEBAR PATIENT DETAILS ------------------------------>
 	<div class="card" style = "margin-top: 20%;">

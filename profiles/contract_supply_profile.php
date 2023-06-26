@@ -26,6 +26,15 @@
 require_once('../connect.php');
 require_once('../config.php');
 session_start();
+/* ---------------------------------------------------------------------------------------------- *
+ *                       ONLY LOGGED IN USERS CAN ACCESS THESE CONTENT                            *
+ * ---------------------------------------------------------------------------------------------- */
+if (!isset($_SESSION['role']))
+{
+	header("Location: ../authentication/login.php");
+	exit;
+}
+
 
 /* ---------------------------------------------------------------------------------------------- *
  *              ALLOW ADMINISTRATOR, PHARMACY, PHARMACEUTICAL AND SUPERVISOR ACCESS               *
@@ -105,7 +114,22 @@ foreach ($supply_items as $item) {
 		_HTML;
 	$unique_id += 1;
 }
-	
+
+/* ---------------------------------------------------------------------------------------------- *
+ *     	     LIMIT PERMISSIONS TO CONFIRM PAYMENT TO ADMINISTRATORS AND SUPERVISORS               *
+ *                                                                                                *
+ * To facilitate this, we need a flag that indicates the role of the current user. Initially,     *
+ * I attempted to use the $_SESSION['role'] value to determine whether the action button should   *
+ * be enabled or disabled.                                                                        *
+ * However, I encountered a problem where the $role variable was only recognized as 0.            *
+ * Upon further investigation, I discovered that JavaScript only recognizes PHP integer variables.*
+ * ---------------------------------------------------------------------------------------------- */
+$role = 0;
+if ($_SESSION['role'] == 'administrator' || $_SESSION['role'] == 'supervisor')
+{
+	$role = 1;
+}
+
 /* ---------------------------------------------------------------------------------------------- *
  *                          ACTUAL HTML CONTENT TO BE SENT TO BASE.PHP                            *
  * ---------------------------------------------------------------------------------------------- */
@@ -119,11 +143,22 @@ $content = <<<_HTML
 	<div style = "padding-top: 10px; padding-bottom: 10px; padding-left: 30px;">
 	<ul class = "list-unstyled lead">
 	<li><span class = "explanation">Supply ID</span> {$supply['contractSupplyId']}</li>
-	<li><span class = "explanation">Contract ID</span> {$supply['contractId']}</li>
-	<li>
-	<span class = "explanation">Pharmaceutical</span> {$supply['pharmaceutical_title']}
+	<li><span class = "explanation">Contract ID</span> 
+	<a href = "contract_profile.php?contractId={$supply['contractId']}">
+	{$supply['contractId']}
+	</a>
 	</li>
-	<li><span class = "explanation">Pharmacy</span> {$supply['pharmacy_title']}</li>
+	<li>
+	<span class = "explanation">Pharmaceutical:</span> 
+	<a href = "pharmaceutical_profile.php?pharmaceuticalId={$supply['pharmaceuticalId']}">
+	{$supply['pharmaceutical_title']}
+	</a>
+	</li>
+	<li><span class = "explanation">Pharmacy:</span> 
+	<a href = "pharmacy_profile.php?pharmacyId={$supply['pharmacyId']}">
+	{$supply['pharmacy_title']}
+	</a>
+	</li>
 	<li>
 	<span class = "explanation">Payment Status</span>
 	<span id = "paymentStatus">{$supply['paymentComplete']}</span>
@@ -145,7 +180,7 @@ $content = <<<_HTML
 	</div>
 	<!------------------------------ LINK TO ADD NEW SUPPLY ITEM ------------------------------>
 	<div class = "new-supply">
-	<a href = "../registration/register_supply_item.php" class = "btn btn-primary btn-pill">
+	<a id = "addSupplyItems" href = "../registration/register_supply_item.php?contractSupplyId={$contractSupplyId}" class = "btn btn-primary btn-pill">
 	Add Supply Items to Cart
 	</a>
 	</div>
@@ -172,6 +207,8 @@ $content = <<<_HTML
 	</table>
 	</div>
 	</div>
+	</div>
+	</div>
 	<!---------------------------------- JAVASCRIPT AND JQUERY -------------------------------->
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js">
 	</script>
@@ -180,7 +217,8 @@ $content = <<<_HTML
 		var lastUpdated = document.getElementById("lastUpdated");
 		var paymentStatus = document.getElementById("paymentStatus");
 		var confirmPayment = document.getElementById("confirmPayment");
-		
+		var addSupplyItems = document.getElementById("addSupplyItems");
+	
 		dateCreated.innerText = moment(dateCreated.innerText).format(
 			'dddd MMMM D, YYYY h:mm A');
 			
@@ -192,11 +230,18 @@ $content = <<<_HTML
 			paymentStatus.innerText = "Complete";
 			paymentStatus.style.color = "green";
 			confirmPayment.remove();
+			addSupplyItems.remove();
 		}
 		else if (paymentStatus.innerText == 0)
 		{
 			paymentStatus.innerText = "Pending";
 			paymentStatus.style.color = "red";
+
+			/* Only a supervisor and administrator can confirm payment of supply */
+			if ($role == 0)
+			{
+				confirmPayment.remove();
+			}
 		}
 
 	</script>

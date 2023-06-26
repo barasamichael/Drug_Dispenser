@@ -4,9 +4,18 @@ require_once('../config.php');
 
 session_start();
 /* ---------------------------------------------------------------------------------------------- *
+ *                       ONLY LOGGED IN USERS CAN ACCESS THESE CONTENT                            *
+ * ---------------------------------------------------------------------------------------------- */
+if (!isset($_SESSION['role']))
+{
+	header("Location: ../authentication/login.php");
+	exit;
+}
+
+/* ---------------------------------------------------------------------------------------------- *
  *                         ALLOW ACCESS TO ADMINISTRATOR AND SUPERVISOR                           *
  * ---------------------------------------------------------------------------------------------- */
-if ($_SESSION['role'] != 'administrator' || $_SESSION['role'] != 'supervisor')
+if ($_SESSION['role'] != 'administrator' && $_SESSION['role'] != 'supervisor')
 {
 	http_response_code(403);
 	header("Location: ../templates/errors/403.php");

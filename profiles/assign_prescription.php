@@ -3,6 +3,15 @@ require_once('../connect.php');
 require_once('../config.php');
 
 session_start();
+/* ---------------------------------------------------------------------------------------------- *
+ *                       ONLY LOGGED IN USERS CAN ACCESS THESE CONTENT                            *
+ * ---------------------------------------------------------------------------------------------- */
+if (!isset($_SESSION['role']))
+{
+	header("Location: ../authentication/login.php");
+	exit;
+}
+
 
 /* ---------------------------------------------------------------------------------------------- *
  *                              ALLOW ADMINISTRATOR AND PHARMACY ACCESS                           *
